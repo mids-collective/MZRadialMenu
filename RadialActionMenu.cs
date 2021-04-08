@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using Dalamud.Plugin;
-using ImGuiComponents;
+using ImComponents;
 using ImGuiNET;
 using MZRadialMenu.Attributes;
 
