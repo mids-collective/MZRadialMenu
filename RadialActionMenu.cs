@@ -18,7 +18,7 @@ namespace MZRadialMenu
 #else
         private bool ConfigOpen = false;
 #endif
-        public void RenderWheel(Shortcut ct)
+        private void RenderWheel(Shortcut ct)
         {
             if (AdvRadialMenu.BeginRadialMenu(ct.Title))
             {
@@ -37,7 +37,7 @@ namespace MZRadialMenu
                 AdvRadialMenu.EndRadialMenu();
             }
         }
-        public void RenderWheel()
+        private void RenderWheel()
         {
             var open = Keyboard.IsPressed(Keyboard.GetKeyboard()[Config.key]);
             if (open)
@@ -62,7 +62,7 @@ namespace MZRadialMenu
             }
             AdvRadialMenu.EndRadialPopup();
         }
-        public Shortcut NewShortcut()
+        private Shortcut NewShortcut()
         {
             return new()
             {
@@ -73,7 +73,7 @@ namespace MZRadialMenu
             };
         }
 
-        public Shortcut Retree(Shortcut sh, int id_num)
+        private Shortcut Retree(Shortcut sh, int id_num)
         {
             ImGui.PushID(id_num);
             if (ImGui.TreeNode(""))
@@ -114,7 +114,7 @@ namespace MZRadialMenu
             ImGui.PopID();
             return sh;
         }
-        public void ConfigRender()
+        private void ConfigRender()
         {
             if (ConfigOpen)
             {
@@ -155,7 +155,7 @@ namespace MZRadialMenu
         }
 
         public string Name { get; private set; } = "MZRadialMenu";
-        public void Draw()
+        private void Draw()
         {
             ConfigRender();
             RenderWheel();
@@ -165,13 +165,20 @@ namespace MZRadialMenu
         {
             interf = dpi;
             commandManager = new PluginCommandManager(dpi, this);
-            InitCommands();
             Config = (Wheel)interf.GetPluginConfig() ?? new Wheel();
             interf.UiBuilder.OnBuildUi += Draw;
+            interf.ClientState.OnLogin += (sender, args) =>
+            {
+                InitCommands();
+                if (uiModulePtr != null && uiModulePtr != IntPtr.Zero)
+                    PluginLog.Log("Commands Initialized!");
+                else
+                    PluginLog.Log("Commands Initialization Failed!");
+            };
         }
         [Command("/pwheels")]
         [HelpMessage("Show or hide plugin configuation")]
-        public void ToggleConfig(string cmd, string args)
+        private void ToggleConfig(string cmd, string args)
         {
             ConfigOpen = !ConfigOpen;
         }
@@ -185,7 +192,7 @@ namespace MZRadialMenu
         private GetUIModuleDelegate GetUIModule;
         private EasierProcessChatBoxDelegate _EasierProcessChatBox;
         public IntPtr uiModulePtr;
-        public void InitCommands()
+        private void InitCommands()
         {
             try
             {

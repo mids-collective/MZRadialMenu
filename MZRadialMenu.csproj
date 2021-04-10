@@ -4,6 +4,8 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <Authors>Minizbot2012</Authors>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
   </PropertyGroup>
   <ItemGroup>
