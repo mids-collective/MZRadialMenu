@@ -6,18 +6,17 @@ using System.Linq;
 using System.Reflection;
 using MZRadialMenu.Attributes;
 using static Dalamud.Game.Command.CommandInfo;
+
 namespace MZRadialMenu
 {
     public class PluginCommandManager : IDisposable
     {
-        private DalamudPluginInterface pluginInterface;
+        private DalamudPluginInterface pluginInterface => MZRadialMenu.interf;
         private readonly (string, CommandInfo)[] pluginCommands;
-        private MZRadialMenu host;
-        public PluginCommandManager(DalamudPluginInterface pInterface, MZRadialMenu plugin)
+        private MZRadialMenu host => MZRadialMenu.Host;
+        public PluginCommandManager()
         {
-            host = plugin;
-            pluginInterface = pInterface;
-            this.pluginCommands = host.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)
+            pluginCommands = host.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)
                 .Where(method => method.GetCustomAttribute<CommandAttribute>() != null)
                 .SelectMany(GetCommandInfoTuple)
                 .ToArray();
@@ -31,25 +30,25 @@ namespace MZRadialMenu
         // It's usually sub-1 millisecond anyways, though. It probably doesn't matter at all.
         private void AddCommandHandlers()
         {
-            for (var i = 0; i < this.pluginCommands.Length; i++)
+            for (var i = 0; i < pluginCommands.Length; i++)
             {
-                var (command, commandInfo) = this.pluginCommands[i];
-                this.pluginInterface.CommandManager.AddHandler(command, commandInfo);
+                var (command, commandInfo) = pluginCommands[i];
+                pluginInterface.CommandManager.AddHandler(command, commandInfo);
             }
         }
 
         private void RemoveCommandHandlers()
         {
-            for (var i = 0; i < this.pluginCommands.Length; i++)
+            for (var i = 0; i < pluginCommands.Length; i++)
             {
-                var (command, _) = this.pluginCommands[i];
-                this.pluginInterface.CommandManager.RemoveHandler(command);
+                var (command, _) = pluginCommands[i];
+                pluginInterface.CommandManager.RemoveHandler(command);
             }
         }
 
         private IEnumerable<(string, CommandInfo)> GetCommandInfoTuple(MethodInfo method)
         {
-            var handlerDelegate = (HandlerDelegate)Delegate.CreateDelegate(typeof(HandlerDelegate), this.host, method);
+            var handlerDelegate = (HandlerDelegate)Delegate.CreateDelegate(typeof(HandlerDelegate), host, method);
 
             var command = handlerDelegate.Method.GetCustomAttribute<CommandAttribute>();
             var aliases = handlerDelegate.Method.GetCustomAttribute<AliasesAttribute>();

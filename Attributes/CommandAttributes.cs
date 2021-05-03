@@ -1,4 +1,5 @@
 using System;
+
 namespace MZRadialMenu.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]

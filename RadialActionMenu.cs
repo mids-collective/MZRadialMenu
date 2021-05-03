@@ -1,9 +1,11 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Text;
 using Dalamud.Plugin;
 using ImComponents;
 using ImGuiNET;
+using Microsoft.Win32;
 using MZRadialMenu.Attributes;
 
 namespace MZRadialMenu
@@ -11,13 +13,12 @@ namespace MZRadialMenu
     public class MZRadialMenu : IDalamudPlugin
     {
         private Wheel Config;
-        private DalamudPluginInterface interf;
+        public static DalamudPluginInterface interf { get; private set; }
+        public static MZRadialMenu Host;
         private PluginCommandManager commandManager;
-#if DEBUG
-        private bool ConfigOpen = true;
-#else
+        public static IntPtr textActiveBoolPtr = IntPtr.Zero;
+        public static unsafe bool GameTextInputActive => (textActiveBoolPtr != IntPtr.Zero) && *(bool*)textActiveBoolPtr;
         private bool ConfigOpen = false;
-#endif
         private void RenderWheel(Shortcut ct)
         {
             if (AdvRadialMenu.BeginRadialMenu(ct.Title))
@@ -39,7 +40,7 @@ namespace MZRadialMenu
         }
         private void RenderWheel()
         {
-            var open = Keyboard.IsPressed(Keyboard.GetKeyboard()[Config.key]);
+            var open = Keyboard.IsPressed(Keyboard.GetKeyboard()[Config.key]) && !GameTextInputActive;
             if (open)
             {
                 ImGui.OpenPopup("##Wheel");
@@ -164,44 +165,51 @@ namespace MZRadialMenu
         public void Initialize(DalamudPluginInterface dpi)
         {
             interf = dpi;
-            commandManager = new PluginCommandManager(dpi, this);
+            Host = this;
+            commandManager = new PluginCommandManager();
             Config = (Wheel)interf.GetPluginConfig() ?? new Wheel();
+            InitPointers();
             interf.UiBuilder.OnBuildUi += Draw;
+            interf.UiBuilder.OnOpenConfigUi += (s,c) => ToggleConfig();
             interf.ClientState.OnLogin += (sender, args) =>
             {
                 InitCommands();
-                if (uiModulePtr != null && uiModulePtr != IntPtr.Zero)
+                if (uiModule != null && uiModule != IntPtr.Zero)
                     PluginLog.Log("Commands Initialized!");
                 else
                     PluginLog.Log("Commands Initialization Failed!");
             };
         }
+        private void ToggleConfig() {
+            ConfigOpen = !ConfigOpen;
+        }
         [Command("/pwheels")]
         [HelpMessage("Show or hide plugin configuation")]
         private void ToggleConfig(string cmd, string args)
         {
-            ConfigOpen = !ConfigOpen;
+            ToggleConfig();
         }
         public void Dispose()
         {
             interf.UiBuilder.OnBuildUi -= Draw;
             commandManager.Dispose();
         }
-        private delegate IntPtr GetUIModuleDelegate(IntPtr basePtr);
-        private delegate void EasierProcessChatBoxDelegate(IntPtr uiModule, IntPtr message, IntPtr unused, byte a4);
-        private GetUIModuleDelegate GetUIModule;
-        private EasierProcessChatBoxDelegate _EasierProcessChatBox;
-        public IntPtr uiModulePtr;
+        private unsafe void InitPointers()
+        {
+            var dataptr = interf.TargetModuleScanner.GetStaticAddressFromSig("48 8B 05 ?? ?? ?? ?? 48 8B 48 28 80 B9 8E 18 00 00 00");
+            if (dataptr != IntPtr.Zero)
+                textActiveBoolPtr = *(IntPtr*)(*(IntPtr*)dataptr + 0x28) + 0x188E;
+        }
+        private delegate void ProcessChatBoxDelegate(IntPtr uiModule, IntPtr message, IntPtr unused, byte a4);
+        private delegate IntPtr GetModuleDelegate(IntPtr basePtr);
+        private ProcessChatBoxDelegate ProcessChatBox;
+        private IntPtr uiModule = IntPtr.Zero;
         private void InitCommands()
         {
             try
             {
-                var getUIModulePtr = interf.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
-                var easierProcessChatBoxPtr = interf.TargetModuleScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
-                uiModulePtr = interf.TargetModuleScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8 ?? ?? ?? ??");
-
-                GetUIModule = Marshal.GetDelegateForFunctionPointer<GetUIModuleDelegate>(getUIModulePtr);
-                _EasierProcessChatBox = Marshal.GetDelegateForFunctionPointer<EasierProcessChatBoxDelegate>(easierProcessChatBoxPtr);
+                ProcessChatBox = Marshal.GetDelegateForFunctionPointer<ProcessChatBoxDelegate>(interf.TargetModuleScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9"));
+                uiModule = interf.Framework.Gui.GetUIModule();
             }
             catch
             {
@@ -209,38 +217,21 @@ namespace MZRadialMenu
             }
         }
 
-        public void ExecuteCommand(string cmd)
+        public void ExecuteCommand(string command)
         {
             try
             {
-                if (uiModulePtr == null || uiModulePtr == IntPtr.Zero)
-                    InitCommands();
+                var bytes = Encoding.UTF8.GetBytes(command + "\0");
+                var memStr = Marshal.AllocHGlobal(0x18 + bytes.Length);
 
-                var uiModule = GetUIModule(Marshal.ReadIntPtr(uiModulePtr));
+                Marshal.WriteIntPtr(memStr, memStr + 0x18); // String pointer
+                Marshal.WriteInt64(memStr + 0x8, bytes.Length); // Byte capacity (unused)
+                Marshal.WriteInt64(memStr + 0x10, bytes.Length); // Byte length
+                Marshal.Copy(bytes, 0, memStr + 0x18, bytes.Length); // String
 
-                if (uiModule == IntPtr.Zero)
-                {
-                    throw new ApplicationException("uiModule was null");
-                }
+                ProcessChatBox(uiModule, memStr, IntPtr.Zero, 0);
 
-                var command = cmd;
-
-                var bytes = Encoding.UTF8.GetBytes(command);
-
-                var mem1 = Marshal.AllocHGlobal(400);
-                var mem2 = Marshal.AllocHGlobal(bytes.Length + 30);
-
-                Marshal.Copy(bytes, 0, mem2, bytes.Length);
-                Marshal.WriteByte(mem2 + bytes.Length, 0);
-                Marshal.WriteInt64(mem1, mem2.ToInt64());
-                Marshal.WriteInt64(mem1 + 8, 64);
-                Marshal.WriteInt64(mem1 + 8 + 8, bytes.Length + 1);
-                Marshal.WriteInt64(mem1 + 8 + 8 + 8, 0);
-
-                _EasierProcessChatBox(uiModule, mem1, IntPtr.Zero, 0);
-
-                Marshal.FreeHGlobal(mem1);
-                Marshal.FreeHGlobal(mem2);
+                Marshal.FreeHGlobal(memStr);
             }
             catch
             {
