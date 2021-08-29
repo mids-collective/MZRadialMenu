@@ -1,24 +1,33 @@
 using System.Collections.Generic;
 using Dalamud.Configuration;
-
+using Newtonsoft.Json;
 namespace MZRadialMenu
 {
     public enum ST
     {
-        Menu, Shortcut,
+        Menu, Shortcut
     }
-    public struct Shortcut
+    public class Shortcut
     {
-        public string Title;
-        public ST Type;
-        public List<Shortcut> sublist;
-        public string Command;
+        public string Title = string.Empty;
+        public ST Type = ST.Shortcut;
+        public List<Shortcut> sublist = new();
+        public System.Guid UUID = System.Guid.NewGuid();
+        public string Command = string.Empty;
     }
-    public class Wheel : IPluginConfiguration
+    public class Wheels : IPluginConfiguration
     {
-        public int key = 0x58;
+        public List<Wheel> WheelSet = new();
+        public System.Guid UUID = System.Guid.NewGuid();
+        public int Version { get; set; } = 2;
+    }
+    public class Wheel
+    {
+        public HotkeyButton key = new();
+        public string Name = string.Empty;
+        [JsonIgnore]
+        public bool IsOpen = false;
+        public System.Guid UUID = System.Guid.NewGuid();
         public List<Shortcut> RootMenu = new();
-
-        public int Version { get; set; } = 1;
     }
 }
