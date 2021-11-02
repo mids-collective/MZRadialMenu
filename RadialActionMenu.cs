@@ -4,7 +4,6 @@ using System.Linq;
 using MZRadialMenu.Structures;
 using Dalamud.Logging;
 using Dalamud.Plugin;
-using Dalamud.Game;
 using ImComponents;
 using ImGuiNET;
 namespace MZRadialMenu
@@ -192,7 +191,7 @@ namespace MZRadialMenu
         }
         public MZRadialMenu(DalamudPluginInterface dpi)
         {
-            MyRadialMenu = new AdvRadialMenu();
+            MyRadialMenu = new();
             Dalamud.Initialize(dpi);
             Configuration = (Wheels)Dalamud.PluginInterface.GetPluginConfig() ?? new();
             commandManager = new PluginCommandManager<MZRadialMenu>(this);

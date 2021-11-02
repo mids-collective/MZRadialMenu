@@ -3,11 +3,11 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net5</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Authors>Minizbot2012</Authors>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <Platforms>x64</Platforms>
     <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
+    <Platforms>x64</Platforms>
     <LangVersion>latest</LangVersion>
+    <Authors>Minizbot2012</Authors>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -35,6 +35,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="lib\ImComponents\ImComponents.csproj" />
+    <ProjectReference Include="lib\ImComponents\ImComponents.csproj">
+      <Private>true</Private>
+    </ProjectReference>
   </ItemGroup>
 </Project>
