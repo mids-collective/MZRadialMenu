@@ -14,27 +14,27 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Dalamud">
-      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\Documents\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\Documents\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
+      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
       <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="ImGui.NET">
-      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\Documents\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\Documents\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
+      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
       <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="ImGuiScene">
-      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\Documents\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\Documents\XIVLauncher\addon\Hooks\dev\ImGuiScene.dll</HintPath>
+      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev\ImGuiScene.dll</HintPath>
       <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\ImGuiScene.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\Documents\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\Documents\XIVLauncher\addon\Hooks\dev\Newtonsoft.Json.dll</HintPath>
+      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev\Newtonsoft.Json.dll</HintPath>
       <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\Newtonsoft.Json.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ImComponents\ImComponents.csproj" />
+    <ProjectReference Include="lib\ImComponents\ImComponents.csproj" />
   </ItemGroup>
 </Project>

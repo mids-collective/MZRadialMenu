@@ -1,0 +1,3 @@
+[submodule "lib/ImComponents"]
+	path = lib/ImComponents
+	url = git@github.com:Minizbot2012/ImComponents
