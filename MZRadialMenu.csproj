@@ -7,7 +7,7 @@
     <Platforms>x64</Platforms>
     <LangVersion>latest</LangVersion>
     <Authors>Minizbot2012</Authors>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -31,6 +31,21 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev\Newtonsoft.Json.dll</HintPath>
       <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\Newtonsoft.Json.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="FFXIVClientStructs">
+      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev\FFXIVClientStructs.dll</HintPath>
+      <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\FFXIVClientStructs.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Lumina">
+      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev\Lumina.dll</HintPath>
+      <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\Lumina.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Lumina.Excel">
+      <HintPath Condition="Exists('$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev')">$(HOME)\Games\SquareEnix\Data\XIVLauncher\addon\Hooks\dev\Lumina.Excel.dll</HintPath>
+      <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\Lumina.Excel.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>

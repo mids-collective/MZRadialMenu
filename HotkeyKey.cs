@@ -1,8 +1,8 @@
 using ImGuiNET;
-using System.Text;
+using Dalamud.Game.ClientState.Keys;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
-using System;
+using Newtonsoft.Json.Converters;
 
 namespace MZRadialMenu
 {
@@ -11,18 +11,19 @@ namespace MZRadialMenu
     {
         [DllImport("user32.dll")]
         static extern int MapVirtualKey(uint uCode, uint uMapType);
-        public int key = 0x0;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public VirtualKey key = VirtualKey.NO_KEY;
         [JsonIgnore]
         private bool waitingForKey = false;
-        private System.Guid UUID = System.Guid.NewGuid();
+        public System.Guid UUID = System.Guid.NewGuid();
         private void WaitForKey()
         {
-            for (int i = 0; i < 160; i++)
+            foreach (var ky in Dalamud.Keys.GetValidVirtualKeys())
             {
-                if (Dalamud.Keys[i])
+                if (Dalamud.Keys[ky])
                 {
                     waitingForKey = false;
-                    key = i;
+                    key = ky;
                 }
             }
         }
@@ -31,11 +32,10 @@ namespace MZRadialMenu
             ImGui.PushID(UUID.ToString());
             if (!waitingForKey)
             {
-                int chr = MapVirtualKey((uint)key, 0x2);
                 var str = $"Binding: ";
-                if (chr != 0)
+                if (key != VirtualKey.NO_KEY)
                 {
-                    str += $"{Convert.ToChar(chr)}";
+                    str += $"{key.ToString()}";
                 }
                 else
                 {
