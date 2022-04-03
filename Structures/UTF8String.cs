@@ -8,7 +8,6 @@ namespace MZRadialMenu.Structures
     public readonly struct UTF8String : IDisposable
     {
         public const int size = 0x68;
-
         public readonly IntPtr stringPtr;
         public readonly ulong capacity;
         public readonly ulong length;
@@ -17,15 +16,12 @@ namespace MZRadialMenu.Structures
         public readonly byte notReallocated; // Taking suggestions for a better name
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x40)]
         public readonly byte[] str;
-
         public UTF8String(IntPtr loc, string text) : this(loc, Encoding.UTF8.GetBytes(text)) { }
-
         public UTF8String(IntPtr loc, byte[] text)
         {
             capacity = 0x40;
             length = (ulong)text.Length + 1;
             str = new byte[capacity];
-
             if (length > capacity)
             {
                 stringPtr = Marshal.AllocHGlobal(text.Length + 1);
@@ -40,11 +36,9 @@ namespace MZRadialMenu.Structures
                 text.CopyTo(str, 0);
                 notReallocated = 1;
             }
-
             isEmpty = (byte)((length == 1) ? 1 : 0);
             unknown = 0;
         }
-
         public void Dispose()
         {
             if (notReallocated == 0)

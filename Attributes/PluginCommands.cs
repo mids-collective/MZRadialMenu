@@ -11,7 +11,6 @@ namespace MZRadialMenu.Attributes
     {
         private readonly T _plugin;
         private readonly (string, CommandInfo)[] _pluginCommands;
-
         public PluginCommandManager(T plugin)
         {
             _plugin = plugin;
@@ -22,19 +21,16 @@ namespace MZRadialMenu.Attributes
 
             AddCommandHandlers();
         }
-
         private void AddCommandHandlers()
         {
             foreach (var (command, commandInfo) in _pluginCommands)
                 Dalamud.Commands.AddHandler(command, commandInfo);
         }
-
         private void RemoveCommandHandlers()
         {
             foreach (var (command, _) in _pluginCommands)
                 Dalamud.Commands.RemoveHandler(command);
         }
-
         private IEnumerable<(string, CommandInfo)> GetCommandInfoTuple(MethodInfo method)
         {
             var handlerDelegate = (CommandInfo.HandlerDelegate)Delegate.CreateDelegate(typeof(CommandInfo.HandlerDelegate), _plugin, method);

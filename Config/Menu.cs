@@ -1,14 +1,18 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using ImComponents;
 using MZRadialMenu.Attributes;
 using ImGuiNET;
-namespace MZRadialMenu.Config {
-    [WheelType(typeof(Menu))]
+using Newtonsoft.Json;
+namespace MZRadialMenu.Config
+{
+    [WheelType("Menu", false)]
     public class Menu : BaseItem
     {
         public void RawRender()
         {
-            ImGui.InputText("Title", ref this.Title, 20);
+            ImGui.InputText("Title", ref this.Title, 0xF);
             for (int i = 0; i < this.Sublist.Count; i++)
             {
                 ImGui.PushID(this.Sublist[i].UUID);
@@ -23,24 +27,22 @@ namespace MZRadialMenu.Config {
                 }
                 ImGui.PopID();
             }
-            if (ImGui.Button("+ Menu"))
+            int c = 0;
+            foreach (var t in Types)
             {
-                this.Sublist.Add(new Menu());
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("+ Shortcut"))
-            {
-                this.Sublist.Add(new Shortcut());
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("+ Teleport"))
-            {
-                this.Sublist.Add(new Teleport());
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("+ Job"))
-            {
-                this.Sublist.Add(new Job());
+                if (!t.Value.Hide)
+                {
+                    ImGui.PushID(this.UUID);
+                    if (ImGui.Button($"+ {t.Value.Name}"))
+                    {
+                        this.Sublist.Add(Activator.CreateInstance(t.Key) as BaseItem);
+                    }
+                    if (++c != Types.Count - 1)
+                    {
+                        ImGui.SameLine();
+                    }
+                    ImGui.PopID();
+                }
             }
         }
         public override void ReTree()
@@ -65,5 +67,7 @@ namespace MZRadialMenu.Config {
             }
         }
         public List<BaseItem> Sublist = new();
+        [JsonIgnore]
+        private static Dictionary<Type, WheelTypeAttribute> Types = Registry.GetTypes<WheelTypeAttribute>().ToDictionary(x => x, y => y.GetCustomAttributes(typeof(WheelTypeAttribute), false).Select(x => x as WheelTypeAttribute).First());
     }
 }

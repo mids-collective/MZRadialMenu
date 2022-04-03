@@ -30,8 +30,7 @@ namespace MZRadialMenu.Config
         }
         public Converter()
         {
-            var Types = AppDomain.CurrentDomain.GetAssemblies().AsParallel().SelectMany(x => x.GetTypes());
-            Conversions = Types.Where(attr => attr.GetCustomAttributes(typeof(WheelTypeAttribute), true).Length > 0).ToList();
+            Conversions = Registry.GetTypes<WheelTypeAttribute>();
         }
         public List<Type> Conversions;
         public override bool CanRead => true;
@@ -66,7 +65,7 @@ namespace MZRadialMenu.Config
             foreach (var vobj in jsonObj)
             {
                 var f = typ.GetField(vobj.Key);
-                if (f.FieldType.IsClass && f.FieldType != typeof(string))
+                if (f.FieldType.IsClass && f.FieldType != typeof(string) && f.FieldType.GetElementType() != typeof(string))
                 {
                     var tmp = Activator.CreateInstance(f.FieldType);
                     serializer.Populate(vobj.Value.CreateReader(), tmp);
@@ -81,6 +80,14 @@ namespace MZRadialMenu.Config
                             break;
                         case JTokenType.Boolean:
                             f.SetValue(obj, (bool)vobj.Value);
+                            break;
+                        case JTokenType.Array:
+                            switch (Type.GetTypeCode(f.FieldType.GetElementType()))
+                            {
+                                case TypeCode.String:
+                                    f.SetValue(obj, vobj.Value.Values<string>().ToArray());
+                                    break;
+                            }
                             break;
                     }
                 }

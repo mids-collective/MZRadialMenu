@@ -1,12 +1,15 @@
+using System.Linq;
 using MZRadialMenu.Attributes;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using ImGuiNET;
 using ImComponents;
 using Lumina.Excel.GeneratedSheets;
+using Newtonsoft.Json;
+
 namespace MZRadialMenu.Config
 {
-    [WheelType(typeof(Teleport))]
+    [WheelType("Teleport", false)]
     public class Teleport : BaseItem
     {
         public unsafe void Execute()
@@ -20,7 +23,8 @@ namespace MZRadialMenu.Config
             {
                 return;
             }
-            if(Dalamud.ClientState.LocalPlayer.HomeWorld.Id != Dalamud.ClientState.LocalPlayer.CurrentWorld.Id && this.IsHouse) {
+            if (Dalamud.ClientState.LocalPlayer.HomeWorld.Id != Dalamud.ClientState.LocalPlayer.CurrentWorld.Id && this.IsHouse)
+            {
                 Dalamud.Chat.PrintError($"Cannot teleport to housing while using visiting other worlds!");
             }
             Telepo.Instance()->Teleport(this.TelepoID, this.TelepoSubID);
@@ -31,26 +35,27 @@ namespace MZRadialMenu.Config
             ImGui.PushID(this.UUID);
             if (ImGui.TreeNode(this.UUID, this.Title))
             {
-                ImGui.InputText("Title", ref this.Title, 20);
+                ImGui.InputText("Title", ref this.Title, 0xF);
                 if (
                     ImGui.BeginCombo(
-                        "Teleport", Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(this.TelepoID).Territory.Value?.PlaceName.Value?.Name.ToString()) + " - " +
-                        Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(this.TelepoID).PlaceName.Value?.Name.ToString())
+                        "Teleport", Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(this.TelepoID).PlaceName.Value?.Name.ToString())
                     )
                 )
                 {
-                    foreach (var itm in Dalamud.AetheryteList)
+                    foreach (var itm in Dalamud.AetheryteList
+                        .OrderBy(x => Aetherytes.GetRow(x.AetheryteData.GameData.RowId).Territory.Value.PlaceNameRegion.Row)
+                        .ThenBy(x => Aetherytes.GetRow(x.AetheryteData.GameData.RowId).PlaceName.Row)
+                    )
                     {
                         if (
                             ImGui.Selectable(
-                                Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(itm.AetheryteData.GameData.RowId).Territory.Value?.PlaceName.Value?.Name.ToString()) + " - "
-                                + Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(itm.AetheryteData.GameData.RowId).PlaceName.Value?.Name.ToString())
+                                Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(itm.AetheryteData.GameData.RowId).PlaceName.Value?.Name.ToString())
                             )
                         )
                         {
                             this.TelepoID = itm.AetheryteId;
                             this.TelepoSubID = itm.SubIndex;
-                            this.IsHouse = itm.IsSharedHouse || itm.IsAppartment || itm.Ward !=0 || itm.Plot !=0;
+                            this.IsHouse = itm.IsSharedHouse || itm.IsAppartment || itm.Ward != 0 || itm.Plot != 0;
                         }
                         if (itm.AetheryteId == this.TelepoID && itm.SubIndex == this.TelepoSubID)
                         {
@@ -72,7 +77,7 @@ namespace MZRadialMenu.Config
         public bool IsHouse = false;
         public uint TelepoID = 0;
         public byte TelepoSubID = 0;
-
-        private Lumina.Excel.ExcelSheet<Aetheryte> Aetherytes = Dalamud.GameData.GetExcelSheet<Aetheryte>(Dalamud.ClientState.ClientLanguage)!;
+        [JsonIgnore]
+        private static Lumina.Excel.ExcelSheet<Aetheryte> Aetherytes = Dalamud.GameData.GetExcelSheet<Aetheryte>(Dalamud.ClientState.ClientLanguage)!;
     }
 }

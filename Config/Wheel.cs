@@ -4,7 +4,7 @@ using ImGuiNET;
 using Newtonsoft.Json;
 namespace MZRadialMenu.Config
 {
-    [WheelType(typeof(Wheel))]
+    [WheelType("Wheel", true)]
     public class Wheel : Menu
     {
         public override void Render(AdvRadialMenu radialMenu)
@@ -13,32 +13,31 @@ namespace MZRadialMenu.Config
             {
                 itm.Render(radialMenu);
             }
-
         }
-    public void Render(AdvRadialMenu radialMenu, bool open)
-    {
-        if (this.IsOpen)
+        public void Render(AdvRadialMenu radialMenu, bool open)
         {
-            if (radialMenu.BeginRadialPopup("##Wheel", open))
+            if (this.IsOpen)
             {
-                this.Render(radialMenu);
-                radialMenu.EndRadialMenu();
+                if (radialMenu.BeginRadialPopup("##Wheel", open))
+                {
+                    this.Render(radialMenu);
+                    radialMenu.EndRadialMenu();
+                }
             }
         }
-    }
-    public override void ReTree()
-    {
-        ImGui.PushID(this.UUID);
-        if (ImGui.TreeNode(this.UUID, this.Title))
+        public override void ReTree()
         {
-            this.key.Render();
-            base.RawRender();
-            ImGui.TreePop();
+            ImGui.PushID(this.UUID);
+            if (ImGui.TreeNode(this.UUID, this.Title))
+            {
+                this.key.Render();
+                base.RawRender();
+                ImGui.TreePop();
+            }
+            ImGui.PopID();
         }
-        ImGui.PopID();
+        public HotkeyButton key = new();
+        [JsonIgnore]
+        public bool IsOpen = false;
     }
-    public HotkeyButton key = new();
-    [JsonIgnore]
-    public bool IsOpen = false;
-}
 }

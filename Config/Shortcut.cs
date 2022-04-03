@@ -1,8 +1,9 @@
 using MZRadialMenu.Attributes;
 using ImGuiNET;
 using ImComponents;
-namespace MZRadialMenu.Config {
-    [WheelType(typeof(Shortcut))]
+namespace MZRadialMenu.Config
+{
+    [WheelType("Shortcut", false)]
     public class Shortcut : BaseItem
     {
         public override void ReTree()
@@ -10,8 +11,8 @@ namespace MZRadialMenu.Config {
             ImGui.PushID(this.UUID);
             if (ImGui.TreeNode(this.UUID, this.Title))
             {
-                ImGui.InputText("Title", ref this.Title, 10);
-                ImGui.InputText("Command", ref Command, 40);
+                ImGui.InputText("Title", ref this.Title, 0xF);
+                ImGui.InputText("Command", ref Command, 0x40);
                 ImGui.TreePop();
             }
             ImGui.PopID();

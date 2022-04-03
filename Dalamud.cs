@@ -21,32 +21,26 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
-
 namespace MZRadialMenu
 {
     public class Dalamud
     {
         public static void Initialize(DalamudPluginInterface pluginInterface)
             => pluginInterface.Create<Dalamud>();
-
         // @formatter:off
-        [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null;
-        [PluginService] public static CommandManager Commands { get; private set; } = null;
-        [PluginService] public static SigScanner SigScanner { get; private set; } = null;
+        [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+        [PluginService] public static CommandManager Commands { get; private set; } = null!;
+        [PluginService] public static SigScanner SigScanner { get; private set; } = null!;
         [PluginService] public static DataManager GameData { get; private set; } = null!;
-        [PluginService] public static ClientState ClientState { get; private set; } = null;
-        [PluginService] public static ChatGui                Chat            { get; private set; } = null!;
+        [PluginService] public static ClientState ClientState { get; private set; } = null!;
+        [PluginService] public static ChatGui Chat { get; private set; } = null!;
         //[PluginService] public static ChatHandlers           ChatHandlers    { get; private set; } = null!;
-        //[PluginService] public static Framework Framework { get; private set; } = null;
+        //[PluginService] public static Framework              Framework       { get; private set; } = null!;
         //[PluginService] public static GameNetwork            Network         { get; private set; } = null!;
         //[PluginService] public static Condition              Conditions      { get; private set; } = null!;
-        [PluginService] public static KeyState Keys { get; private set; } = null;
-        [PluginService] public static GameGui GameGui { get; private set; } = null;
+        [PluginService] public static KeyState Keys { get; private set; } = null!;
+        [PluginService] public static GameGui GameGui { get; private set; } = null!;
         //[PluginService] public static FlyTextGui             FlyTexts        { get; private set; } = null!;
         //[PluginService] public static ToastGui               Toasts          { get; private set; } = null!;
         //[PluginService] public static JobGauges              Gauges          { get; private set; } = null!;
@@ -57,8 +51,8 @@ namespace MZRadialMenu
         //[PluginService] public static ObjectTable Objects { get; private set; } = null!;
         //[PluginService] public static FateTable              Fates           { get; private set; } = null!;
         //[PluginService] public static LibcFunction           LibC            { get; private set; } = null!;
-        [PluginService] public static AetheryteList           AetheryteList            { get; private set; } = null!;
+        [PluginService] public static AetheryteList AetheryteList { get; private set; } = null!;
         // @formatter:on
     }
-    
+
 }

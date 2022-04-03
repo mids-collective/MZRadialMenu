@@ -1,12 +1,16 @@
 using System.Linq;
-using MZRadialMenu.Attributes;
-using ImGuiNET;
-using Newtonsoft.Json;
-using Dalamud.Logging;
+
 using ImComponents;
+using ImGuiNET;
+
+using MZRadialMenu.Attributes;
+
+using Newtonsoft.Json;
+
 using Lumina.Excel.GeneratedSheets;
-namespace MZRadialMenu.Config {
-    [WheelType(typeof(Job))]
+namespace MZRadialMenu.Config
+{
+    [WheelType("Job", false)]
     public class Job : BaseItem
     {
         public override void ReTree()
@@ -14,13 +18,14 @@ namespace MZRadialMenu.Config {
             ImGui.PushID(this.UUID);
             if (ImGui.BeginCombo("Job / Class", this.Title))
             {
-                foreach (var cjb in cljb)
+                foreach (var cjb in cljb.Where(x => x.Name != "adventurer").OrderBy(x => x.Role).ThenBy(x => x.ClassJobParent.Row).ThenBy(x => x.RowId))
                 {
                     if (ImGui.Selectable(cjb.Name.ToString()))
                     {
                         Title = cjb.Name.ToString();
                     }
-                    if(Title.Equals(cjb.Name.ToString())) {
+                    if (Title.Equals(cjb.Name.ToString()))
+                    {
                         ImGui.SetItemDefaultFocus();
                     }
                 }
@@ -32,7 +37,6 @@ namespace MZRadialMenu.Config {
         {
             if (radialMenu.RadialMenuItem(this.Title))
             {
-                PluginLog.Information(this.Title);
                 MZRadialMenu.Instance.ExecuteCommand($"/gearset change {cljb.Where(x => x.Name.ToString().Equals(this.Title)).First().Abbreviation.ToString().ToUpper()}");
             }
         }

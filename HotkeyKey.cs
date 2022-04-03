@@ -45,6 +45,11 @@ namespace MZRadialMenu
                 {
                     waitingForKey = true;
                 }
+                ImGui.SameLine();
+                if (ImGui.Button("Clear Binding"))
+                {
+                    key = VirtualKey.NO_KEY;
+                }
             }
             else
             {
