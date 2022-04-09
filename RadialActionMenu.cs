@@ -19,6 +19,7 @@ using FFXIVClientStructs.FFXIV.Client.UI.Shell;
 using MZRadialMenu.Structures;
 using MZRadialMenu.Attributes;
 using MZRadialMenu.Config;
+using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace MZRadialMenu
 {
@@ -66,6 +67,7 @@ namespace MZRadialMenu
         // Use Items
         private delegate* unmanaged<IntPtr, uint, uint, uint, short, void> useItem;
         private delegate* unmanaged<uint, uint, uint> getActionID;
+        private const int aetherCompassID = 2_001_886;
         //ChatBox Execution
         private delegate void ProcessChatBoxDelegate(UIModule* uiModule, IntPtr message, IntPtr unused, byte a4);
         private ProcessChatBoxDelegate ProcessChatBox;
@@ -174,6 +176,13 @@ namespace MZRadialMenu
         public void UseItem(uint id)
         {
             if (id == 0 || !usables.ContainsKey(id is >= 1_000_000 and < 2_000_000 ? id - 1_000_000 : id)) return;
+
+            // Aether Compass
+            if (id == aetherCompassID)
+            {
+                ActionManager.Instance()->UseAction(ActionType.Spell, 26988);
+                return;
+            }
 
             // Dumb fix for dumb bug
             if (retryItem == 0 && id < 2_000_000)
