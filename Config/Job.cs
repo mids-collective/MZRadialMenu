@@ -8,6 +8,8 @@ using MZRadialMenu.Attributes;
 using Newtonsoft.Json;
 
 using Lumina.Excel.GeneratedSheets;
+using Dalamud.Logging;
+
 namespace MZRadialMenu.Config
 {
     [WheelType("Job", false)]
@@ -20,11 +22,11 @@ namespace MZRadialMenu.Config
             {
                 foreach (var cjb in cljb.Where(x => x.Name != "adventurer").OrderBy(x => x.Role).ThenBy(x => x.ClassJobParent.Row).ThenBy(x => x.RowId))
                 {
-                    if (ImGui.Selectable(cjb.Name.ToString()))
+                    if (ImGui.Selectable(cjb.NameEnglish.ToString()))
                     {
-                        Title = cjb.Name.ToString();
+                        Title = cjb.NameEnglish.ToString();
                     }
-                    if (Title.Equals(cjb.Name.ToString()))
+                    if (Title.Equals(cjb.NameEnglish.ToString()))
                     {
                         ImGui.SetItemDefaultFocus();
                     }
@@ -37,7 +39,8 @@ namespace MZRadialMenu.Config
         {
             if (radialMenu.RadialMenuItem(this.Title))
             {
-                MZRadialMenu.Instance.ExecuteCommand($"/gearset change {cljb.Where(x => x.Name.ToString().Equals(this.Title)).First().Abbreviation.ToString().ToUpper()}");
+                PluginLog.Debug($"{cljb.Where(x => x.NameEnglish.ToString().Equals(this.Title)).First().NameEnglish.ToString()}");
+                MZRadialMenu.Instance.ExecuteCommand($"/gs change \"{cljb.Where(x => x.NameEnglish.ToString().Equals(this.Title)).First().NameEnglish.ToString()}\"");
             }
         }
         [JsonIgnore]
