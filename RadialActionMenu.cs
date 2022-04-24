@@ -158,6 +158,8 @@ namespace MZRadialMenu
                 InitCommands();
             }
             Dalamud.ClientState.Login += handleLogin;
+            
+
         }
         private void handleLogin(object sender, EventArgs args)
         {
@@ -251,6 +253,7 @@ namespace MZRadialMenu
                 usables = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>().Where(i => i.ItemAction.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
                     .Concat(Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>().Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
                     .ToDictionary(kv => kv.Key, kv => kv.Value);
+                usables[aetherCompassID] = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.GetRow(aetherCompassID)?.Name.ToString().ToLower();
             }
             catch { PluginLog.LogError("Failed to load UseItem"); }
         }
