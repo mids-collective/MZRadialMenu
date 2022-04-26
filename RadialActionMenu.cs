@@ -38,7 +38,7 @@ namespace MZRadialMenu
         public RaptureShellModule* shellModule;
         public RaptureMacroModule* macroModule;
         private UIModule* uiModule;
-        public IntPtr GetAgentByInternalID(uint id) => (IntPtr)agentModule->GetAgentByInternalID(id);
+        public IntPtr GetAgentByInternalID(AgentId id) => (IntPtr)agentModule->GetAgentByInternalId(id);
         // Macro Execution
         public delegate void ExecuteMacroDelegate(RaptureShellModule* raptureShellModule, IntPtr macro);
         public ExecuteMacroDelegate ExecuteMacro;
@@ -248,7 +248,7 @@ namespace MZRadialMenu
             try
             {
                 useItem = (delegate* unmanaged<IntPtr, uint, uint, uint, short, void>)Dalamud.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 41 B0 01 BA 13 00 00 00");
-                itemContextMenuAgent = GetAgentByInternalID(10);
+                itemContextMenuAgent = GetAgentByInternalID(AgentId.InventoryContext);
 
                 usables = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>().Where(i => i.ItemAction.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
                     .Concat(Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>().Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
