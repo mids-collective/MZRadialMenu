@@ -158,7 +158,7 @@ namespace MZRadialMenu
                 InitCommands();
             }
             Dalamud.ClientState.Login += handleLogin;
-            
+
 
         }
         private void handleLogin(object sender, EventArgs args)
