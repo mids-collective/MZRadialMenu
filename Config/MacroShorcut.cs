@@ -36,10 +36,10 @@ namespace MZRadialMenu.Config
             using var ExMacro = new ExtendedMacro(macroPtr, string.Empty, this.Commands);
             Marshal.StructureToPtr(ExMacro, macroPtr, false);
             var commandCount = (byte)Math.Max(Macro.numLines, Commands.Length);
-            MZRadialMenu.Instance.NumCopiedMacroLines = commandCount;
-            MZRadialMenu.Instance.NumExecutedMacroLines = commandCount;
-            MZRadialMenu.Instance.ExecuteMacro(MZRadialMenu.Instance.shellModule, macroPtr);
-            MZRadialMenu.Instance.NumCopiedMacroLines = Macro.numLines;
+            MZRadialMenu.NumCopiedMacroLines = commandCount;
+            MZRadialMenu.NumExecutedMacroLines = commandCount;
+            MZRadialMenu.Instance.ExecuteMacro(MZRadialMenu.raptureShellModule, macroPtr);
+            MZRadialMenu.NumCopiedMacroLines = Macro.numLines;
             Marshal.FreeHGlobal(macroPtr);
         }
         public override void Render(AdvRadialMenu radialMenu)

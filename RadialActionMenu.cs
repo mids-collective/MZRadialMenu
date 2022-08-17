@@ -6,6 +6,9 @@ using System.Linq;
 using Dalamud;
 using Dalamud.Logging;
 using Dalamud.Plugin;
+using Dalamud.Utility.Signatures;
+using Dalamud.Hooking;
+
 
 using ImComponents;
 using ImGuiNET;
@@ -32,19 +35,21 @@ namespace MZRadialMenu
         private bool ConfigOpen = false;
         private uint retryItem = 0;
         private Dictionary<uint, string> usables;
-        public IntPtr itemContextMenuAgent;
         //Agents
-        public AgentModule* agentModule;
-        public RaptureShellModule* shellModule;
-        public RaptureMacroModule* macroModule;
+        private IntPtr itemContextMenuAgent;
+        private AgentModule* agentModule;
         private UIModule* uiModule;
-        public IntPtr GetAgentByInternalID(AgentId id) => (IntPtr)agentModule->GetAgentByInternalId(id);
+        private bool IsGameTextInputActive => uiModule->GetRaptureAtkModule()->AtkModule.IsTextInputActive() != 0;
+        private IntPtr GetAgentByInternalID(AgentId id) => (IntPtr)agentModule->GetAgentByInternalId(id);
         // Macro Execution
         public delegate void ExecuteMacroDelegate(RaptureShellModule* raptureShellModule, IntPtr macro);
+        [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 4D 28")]
         public ExecuteMacroDelegate ExecuteMacro;
+        public static RaptureShellModule* raptureShellModule;
+        public static RaptureMacroModule* raptureMacroModule;
         //Extended Macro Execution
-        public IntPtr numCopiedMacroLinesPtr = IntPtr.Zero;
-        public byte NumCopiedMacroLines
+        private static IntPtr numCopiedMacroLinesPtr = IntPtr.Zero;
+        public static byte NumCopiedMacroLines
         {
             get => *(byte*)numCopiedMacroLinesPtr;
             set
@@ -54,8 +59,8 @@ namespace MZRadialMenu
             }
         }
 
-        public IntPtr numExecutedMacroLinesPtr = IntPtr.Zero;
-        public byte NumExecutedMacroLines
+        private static IntPtr numExecutedMacroLinesPtr = IntPtr.Zero;
+        public static byte NumExecutedMacroLines
         {
             get => *(byte*)numExecutedMacroLinesPtr;
             set
@@ -65,11 +70,15 @@ namespace MZRadialMenu
             }
         }
         // Use Items
+        [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 41 B0 01 BA 13 00 00 00")]
         private delegate* unmanaged<IntPtr, uint, uint, uint, short, void> useItem;
+        [Signature("E8 ?? ?? ?? ?? 44 8B 4B 2C")]
         private delegate* unmanaged<uint, uint, uint> getActionID;
         private const int aetherCompassID = 2_001_886;
-        //ChatBox Execution
+        // Command Execution
+        // Command Execution
         private delegate void ProcessChatBoxDelegate(UIModule* uiModule, IntPtr message, IntPtr unused, byte a4);
+        [Signature("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9")]
         private ProcessChatBoxDelegate ProcessChatBox;
         private AdvRadialMenu MyRadialMenu;
         private void RenderWheel()
@@ -80,7 +89,7 @@ namespace MZRadialMenu
                 if (Config.key.key != 0x0)
                 {
                     var open = Dalamud.Keys[Config.key.key];
-                    if (open && !Configuration.WheelSet.Any(x => x.IsOpen))
+                    if (open && !Configuration.WheelSet.Any(x => x.IsOpen) && uiModule != null && !IsGameTextInputActive)
                     {
                         Config.IsOpen = true;
                         ImGui.OpenPopup("##Wheel", ImGuiPopupFlags.NoOpenOverExistingPopup);
@@ -142,24 +151,21 @@ namespace MZRadialMenu
         {
             ConfigRender();
             RenderWheel();
-            //MyRadialMenu.DebugMenu();
         }
         public MZRadialMenu(DalamudPluginInterface dpi)
         {
             MyRadialMenu = new();
+            Instance = this;
             Dalamud.Initialize(dpi);
             commandManager = new PluginCommandManager<MZRadialMenu>(this);
-            Instance = this;
             Configuration = (Wheels)Dalamud.PluginInterface.GetPluginConfig() ?? new();
             Dalamud.PluginInterface.UiBuilder.Draw += Draw;
             Dalamud.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfig;
-            if (dpi.Reason is PluginLoadReason.Reload or PluginLoadReason.Installer or PluginLoadReason.Update)
+            if (Dalamud.ClientState.IsLoggedIn)
             {
                 InitCommands();
             }
             Dalamud.ClientState.Login += handleLogin;
-
-
         }
         private void handleLogin(object sender, EventArgs args)
         {
@@ -186,7 +192,6 @@ namespace MZRadialMenu
                 return;
             }
 
-            // Dumb fix for dumb bug
             if (retryItem == 0 && id < 2_000_000)
             {
                 var actionID = getActionID(2, id);
@@ -214,14 +219,13 @@ namespace MZRadialMenu
         {
             uiModule = Framework.Instance()->GetUiModule();
             agentModule = uiModule->GetAgentModule();
-            shellModule = uiModule->GetRaptureShellModule();
-            macroModule = uiModule->GetRaptureMacroModule();
+            raptureShellModule = uiModule->GetRaptureShellModule();
+            raptureMacroModule = uiModule->GetRaptureMacroModule();
+            SignatureHelper.Initialise(this, true);
             try
             {
-                ExecuteMacro = Marshal.GetDelegateForFunctionPointer<ExecuteMacroDelegate>(Dalamud.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 4D 28"));
                 numCopiedMacroLinesPtr = Dalamud.SigScanner.ScanText("49 8D 5E 70 BF ?? 00 00 00") + 0x5;
                 numExecutedMacroLinesPtr = Dalamud.SigScanner.ScanText("41 83 F8 ?? 0F 8D ?? ?? ?? ?? 49 6B C8 68") + 0x3;
-
             }
             catch
             {
@@ -229,25 +233,6 @@ namespace MZRadialMenu
             }
             try
             {
-                ProcessChatBox = Marshal.GetDelegateForFunctionPointer<ProcessChatBoxDelegate>(Dalamud.SigScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9"));
-                if (ProcessChatBox != null)
-                    PluginLog.Log("Commands Initialized!");
-            }
-            catch
-            {
-                PluginLog.LogError("Failed to Load ProcessChatBox");
-            }
-            try
-            {
-                getActionID = (delegate* unmanaged<uint, uint, uint>)Dalamud.SigScanner.ScanText("E8 ?? ?? ?? ?? 44 8B 4B 2C");
-            }
-            catch
-            {
-                PluginLog.LogError("Failed to Load GetActionID");
-            }
-            try
-            {
-                useItem = (delegate* unmanaged<IntPtr, uint, uint, uint, short, void>)Dalamud.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 41 B0 01 BA 13 00 00 00");
                 itemContextMenuAgent = GetAgentByInternalID(AgentId.InventoryContext);
 
                 usables = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>().Where(i => i.ItemAction.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
@@ -276,7 +261,7 @@ namespace MZRadialMenu
                         int.TryParse(command[1..], out int val);
                         if (val is >= 0 and < 200)
                         {
-                            ExecuteMacro(shellModule, (IntPtr)macroModule + 0x58 + (Macro.size * val));
+                            ExecuteMacro(raptureShellModule, (IntPtr)raptureMacroModule + 0x58 + (Macro.size * val));
                         }
                         break;
                 }
