@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net5</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
     <LangVersion>latest</LangVersion>
     <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
     <Platforms>x64</Platforms>
@@ -10,42 +10,46 @@
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DalamudLibPath Condition="Exists('$(HOME)\.xlcore\dalamud\Hooks\dev')">$(HOME)\.xlcore\dalamud\Hooks\dev</DalamudLibPath>
+    <DalamudLibPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev</DalamudLibPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="Dalamud">
-      <HintPath Condition="Exists('$(HOME)\.xlcore\dalamud\Hooks\dev')">$(HOME)\.xlcore\dalamud\Hooks\dev\Dalamud.dll</HintPath>
-      <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
+      <HintPath>$(DalamudLibPath)\Dalamud.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="ImGui.NET">
-      <HintPath Condition="Exists('$(HOME)\.xlcore\dalamud\Hooks\dev')">$(HOME)\.xlcore\dalamud\Hooks\dev\ImGui.NET.dll</HintPath>
-      <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
+      <HintPath>$(DalamudLibPath)\ImGui.NET.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="ImGuiScene">
-      <HintPath Condition="Exists('$(HOME)\.xlcore\dalamud\Hooks\dev')">$(HOME)\.xlcore\dalamud\Hooks\dev\ImGuiScene.dll</HintPath>
-      <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\ImGuiScene.dll</HintPath>
+      <HintPath>$(DalamudLibPath)\ImGuiScene.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath Condition="Exists('$(HOME)\.xlcore\dalamud\Hooks\dev')">$(HOME)\.xlcore\dalamud\Hooks\dev\Newtonsoft.Json.dll</HintPath>
-      <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\Newtonsoft.Json.dll</HintPath>
+      <HintPath>$(DalamudLibPath)\Newtonsoft.Json.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="FFXIVClientStructs">
-      <HintPath Condition="Exists('$(HOME)\.xlcore\dalamud\Hooks\dev')">$(HOME)\.xlcore\dalamud\Hooks\dev\FFXIVClientStructs.dll</HintPath>
-      <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\FFXIVClientStructs.dll</HintPath>
+      <HintPath>$(DalamudLibPath)\FFXIVClientStructs.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Lumina">
-      <HintPath Condition="Exists('$(HOME)\.xlcore\dalamud\Hooks\dev')">$(HOME)\.xlcore\dalamud\Hooks\dev\Lumina.dll</HintPath>
-      <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\Lumina.dll</HintPath>
+      <HintPath>$(DalamudLibPath)\Lumina.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Lumina.Excel">
-      <HintPath Condition="Exists('$(HOME)\.xlcore\dalamud\Hooks\dev')">$(HOME)\.xlcore\dalamud\Hooks\dev\Lumina.Excel.dll</HintPath>
-      <HintPath Condition="Exists('$(AppData)\XIVLauncher\addon\Hooks\dev')">$(AppData)\XIVLauncher\addon\Hooks\dev\Lumina.Excel.dll</HintPath>
+      <HintPath>$(DalamudLibPath)\Lumina.Excel.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
