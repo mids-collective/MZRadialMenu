@@ -38,7 +38,7 @@ namespace MZRadialMenu.Config
             var commandCount = (byte)Math.Max(Macro.numLines, Commands.Length);
             MZRadialMenu.NumCopiedMacroLines = commandCount;
             MZRadialMenu.NumExecutedMacroLines = commandCount;
-            MZRadialMenu.Instance.ExecuteMacro(MZRadialMenu.raptureShellModule, macroPtr);
+            MZRadialMenu.ExecuteMacroHook!.Original(MZRadialMenu.raptureShellModule, macroPtr);
             MZRadialMenu.NumCopiedMacroLines = Macro.numLines;
             Marshal.FreeHGlobal(macroPtr);
         }

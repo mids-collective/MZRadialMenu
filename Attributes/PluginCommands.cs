@@ -47,7 +47,7 @@ namespace MZRadialMenu.Attributes
             };
 
             // Create list of tuples that will be filled with one tuple per alias, in addition to the base command tuple.
-            var commandInfoTuples = new List<(string, CommandInfo)> { (command?.Command, commandInfo) };
+            var commandInfoTuples = new List<(string, CommandInfo)> { (command!.Command, commandInfo) };
             if (aliases != null)
                 commandInfoTuples.AddRange(aliases.Aliases.Select(alias => (alias, commandInfo)));
 

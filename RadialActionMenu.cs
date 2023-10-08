@@ -28,62 +28,61 @@ namespace MZRadialMenu
 {
     public unsafe class MZRadialMenu : IDalamudPlugin
     {
-        public static MZRadialMenu Instance;
+        public static MZRadialMenu? Instance;
         public string Name => "MZRadialMenu";
         private Wheels Configuration;
         private PluginCommandManager<MZRadialMenu> commandManager;
         private bool ConfigOpen = false;
         private uint retryItem = 0;
-        private Dictionary<uint, string> usables;
+        private Dictionary<uint, string> usables = new();
         //Agents
-        private IntPtr itemContextMenuAgent;
+        private nint itemContextMenuAgent;
         private AgentModule* agentModule;
         private UIModule* uiModule;
-        private bool IsGameTextInputActive => uiModule->GetRaptureAtkModule()->AtkModule.IsTextInputActive() != 0;
-        private IntPtr GetAgentByInternalID(AgentId id) => (IntPtr)agentModule->GetAgentByInternalId(id);
+        private bool IsGameTextInputActive => uiModule->GetRaptureAtkModule()->AtkModule.IsTextInputActive();
+        private nint GetAgentByInternalID(AgentId id) => (nint)agentModule->GetAgentByInternalId(id);
         // Macro Execution
-        public delegate void ExecuteMacroDelegate(RaptureShellModule* raptureShellModule, IntPtr macro);
+        public delegate void ExecuteMacroDelegate(RaptureShellModule* raptureShellModule, nint macro);
         [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 4D 28")]
-        public ExecuteMacroDelegate ExecuteMacro;
+        public static Hook<ExecuteMacroDelegate>? ExecuteMacroHook;
         public static RaptureShellModule* raptureShellModule;
         public static RaptureMacroModule* raptureMacroModule;
         //Extended Macro Execution
-        private static IntPtr numCopiedMacroLinesPtr = IntPtr.Zero;
+        private static nint numCopiedMacroLinesPtr = nint.Zero;
         public static byte NumCopiedMacroLines
         {
             get => *(byte*)numCopiedMacroLinesPtr;
             set
             {
-                if (numCopiedMacroLinesPtr != IntPtr.Zero)
+                if (numCopiedMacroLinesPtr != nint.Zero)
                     SafeMemory.WriteBytes(numCopiedMacroLinesPtr, new[] { value });
             }
         }
 
-        private static IntPtr numExecutedMacroLinesPtr = IntPtr.Zero;
+        private static nint numExecutedMacroLinesPtr = nint.Zero;
         public static byte NumExecutedMacroLines
         {
             get => *(byte*)numExecutedMacroLinesPtr;
             set
             {
-                if (numExecutedMacroLinesPtr != IntPtr.Zero)
+                if (numExecutedMacroLinesPtr != nint.Zero)
                     SafeMemory.WriteBytes(numExecutedMacroLinesPtr, new[] { value });
             }
         }
-        // Use Items
-        [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 41 B0 01 BA 13 00 00 00")]
-        private delegate* unmanaged<IntPtr, uint, uint, uint, short, void> useItem;
+        //Use Item
+        [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 89 7C 24 38")]
+        private static delegate* unmanaged<nint, uint, uint, uint, short, void> useItem;
         [Signature("E8 ?? ?? ?? ?? 44 8B 4B 2C")]
-        private delegate* unmanaged<uint, uint, uint> getActionID;
+        private static delegate* unmanaged<uint, uint, uint> getActionID;
         private const int aetherCompassID = 2_001_886;
         // Command Execution
-        // Command Execution
-        private delegate void ProcessChatBoxDelegate(UIModule* uiModule, IntPtr message, IntPtr unused, byte a4);
+        public delegate void ProcessChatBoxDelegate(UIModule* uiModule, nint message, nint unused, byte a4);
         [Signature("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9")]
-        private ProcessChatBoxDelegate ProcessChatBox;
+        public static ProcessChatBoxDelegate? ProcessChatBox;
         private AdvRadialMenu MyRadialMenu;
         private void RenderWheel()
         {
-            for (int i = 0; i < Configuration.WheelSet.Count; i++)
+            for (int i = 0; i < Configuration!.WheelSet.Count; i++)
             {
                 var Config = Configuration.WheelSet[i];
                 if (Config.key.key != 0x0)
@@ -107,7 +106,7 @@ namespace MZRadialMenu
             if (ConfigOpen)
             {
                 ImGui.Begin("MZ Radial Menu Config", ref ConfigOpen);
-                for (int c = 0; c < Configuration.WheelSet.Count; c++)
+                for (int c = 0; c < Configuration!.WheelSet.Count; c++)
                 {
                     var Config = Configuration.WheelSet[c];
                     ImGui.PushID(c);
@@ -158,16 +157,17 @@ namespace MZRadialMenu
             Instance = this;
             Dalamud.Initialize(dpi);
             commandManager = new PluginCommandManager<MZRadialMenu>(this);
-            Configuration = (Wheels)Dalamud.PluginInterface.GetPluginConfig() ?? new();
+            Configuration = (Wheels?)Dalamud.PluginInterface.GetPluginConfig() ?? new();
             Dalamud.PluginInterface.UiBuilder.Draw += Draw;
             Dalamud.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfig;
             if (Dalamud.ClientState.IsLoggedIn)
             {
                 InitCommands();
+
             }
             Dalamud.ClientState.Login += handleLogin;
         }
-        private void handleLogin(object sender, EventArgs args)
+        private void handleLogin()
         {
             InitCommands();
         }
@@ -188,7 +188,7 @@ namespace MZRadialMenu
             // Aether Compass
             if (id == aetherCompassID)
             {
-                ActionManager.Instance()->UseAction(ActionType.Spell, 26988);
+                ActionManager.Instance()->UseAction(ActionType.Action, 26988);
                 return;
             }
 
@@ -206,13 +206,14 @@ namespace MZRadialMenu
         }
         public void UseItem(string name)
         {
-            if (usables == null || string.IsNullOrWhiteSpace(name)) return;
+            if (string.IsNullOrWhiteSpace(name)) return;
+            if (usables == null) InitCommands();
 
             var newName = name.Replace("\uE03C", ""); // Remove HQ Symbol
             var useHQ = newName != name;
             newName = newName.ToLower().Trim(' ');
 
-            try { UseItem(usables.First(i => i.Value == newName).Key + (uint)(useHQ ? 1_000_000 : 0)); }
+            try { UseItem(usables!.First(i => i.Value == newName).Key + (uint)(useHQ ? 1_000_000 : 0)); }
             catch { }
         }
         private void InitCommands()
@@ -221,7 +222,7 @@ namespace MZRadialMenu
             agentModule = uiModule->GetAgentModule();
             raptureShellModule = uiModule->GetRaptureShellModule();
             raptureMacroModule = uiModule->GetRaptureMacroModule();
-            SignatureHelper.Initialise(this, true);
+            Dalamud.GameInteropProvider.InitializeFromAttributes(this);
             try
             {
                 numCopiedMacroLinesPtr = Dalamud.SigScanner.ScanText("49 8D 5E 70 BF ?? 00 00 00") + 0x5;
@@ -229,18 +230,18 @@ namespace MZRadialMenu
             }
             catch
             {
-                PluginLog.LogError("Failed to Load ExecuteMacro");
+                Dalamud.PluginLog.Error("Failed to Load ExecuteMacro");
             }
             try
             {
                 itemContextMenuAgent = GetAgentByInternalID(AgentId.InventoryContext);
 
-                usables = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>().Where(i => i.ItemAction.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
-                    .Concat(Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>().Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
+                usables = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>()!.Where(i => i.ItemAction.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
+                    .Concat(Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
                     .ToDictionary(kv => kv.Key, kv => kv.Value);
-                usables[aetherCompassID] = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.GetRow(aetherCompassID)?.Name.ToString().ToLower();
+                usables[aetherCompassID] = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.GetRow(aetherCompassID)?.Name.ToString().ToLower()!;
             }
-            catch { PluginLog.LogError("Failed to load UseItem"); }
+            catch { Dalamud.PluginLog.Error("Failed to load UseItem"); }
         }
 
         public void ExecuteCommand(string command)
@@ -261,23 +262,23 @@ namespace MZRadialMenu
                         int.TryParse(command[1..], out int val);
                         if (val is >= 0 and < 200)
                         {
-                            ExecuteMacro(raptureShellModule, (IntPtr)raptureMacroModule + 0x58 + (Macro.size * val));
+                            ExecuteMacroHook!.Original(raptureShellModule, (nint)raptureMacroModule + 0x58 + (Macro.size * val));
                         }
                         break;
                 }
                 return;
             }
-            var stringPtr = IntPtr.Zero;
+            var stringPtr = nint.Zero;
             try
             {
                 stringPtr = Marshal.AllocHGlobal(UTF8String.size);
                 using var str = new UTF8String(stringPtr, command);
                 Marshal.StructureToPtr(str, stringPtr, false);
-                ProcessChatBox(uiModule, stringPtr, IntPtr.Zero, 0);
+                ProcessChatBox!(uiModule, stringPtr, nint.Zero, 0);
             }
             catch
             {
-                PluginLog.Error("Error with injecting command");
+                Dalamud.PluginLog.Error("Error with injecting command");
             }
             Marshal.FreeHGlobal(stringPtr);
         }
@@ -290,6 +291,13 @@ namespace MZRadialMenu
             Dalamud.PluginInterface.UiBuilder.Draw -= Draw;
             Dalamud.ClientState.Login -= handleLogin;
             commandManager.Dispose();
+        }
+
+        public static void ExecuteMacroDetour(RaptureShellModule* raptureShellModule, nint macro)
+        {
+            NumCopiedMacroLines = Macro.numLines;
+            NumExecutedMacroLines = Macro.numLines;
+            ExecuteMacroHook!.Original(raptureShellModule, macro);
         }
     }
 }

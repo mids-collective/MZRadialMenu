@@ -35,7 +35,7 @@ namespace MZRadialMenu.Config
                     ImGui.PushID(this.UUID);
                     if (ImGui.Button($"+ {t.Value.Name}"))
                     {
-                        this.Sublist.Add(Activator.CreateInstance(t.Key) as BaseItem);
+                        this.Sublist.Add((Activator.CreateInstance(t.Key) as BaseItem)!);
                     }
                     if (++c != Types.Count - 1)
                     {
@@ -68,6 +68,6 @@ namespace MZRadialMenu.Config
         }
         public List<BaseItem> Sublist = new();
         [JsonIgnore]
-        private static Dictionary<Type, WheelTypeAttribute> Types = Registry.GetTypes<WheelTypeAttribute>().ToDictionary(x => x, y => y.GetCustomAttributes(typeof(WheelTypeAttribute), false).Select(x => x as WheelTypeAttribute).First());
+        private static Dictionary<Type, WheelTypeAttribute> Types = Registry.GetTypes<WheelTypeAttribute>().ToDictionary(x => x, y => y.GetCustomAttributes(typeof(WheelTypeAttribute), false).Select(x => x as WheelTypeAttribute).First())!;
     }
 }

@@ -18,7 +18,7 @@ namespace MZRadialMenu.Config
             {
                 return;
             }
-            var status = ActionManager.Instance()->GetActionStatus(ActionType.Spell, 5);
+            var status = ActionManager.Instance()->GetActionStatus(ActionType.Action, 5);
             if (status != 0)
             {
                 return;
@@ -38,18 +38,18 @@ namespace MZRadialMenu.Config
                 ImGui.InputText("Title", ref this.Title, 0xF);
                 if (
                     ImGui.BeginCombo(
-                        "Teleport", Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(this.TelepoID).PlaceName.Value?.Name.ToString())
+                        "Teleport", Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(this.TelepoID)!.PlaceName.Value?.Name.ToString()!)
                     )
                 )
                 {
                     foreach (var itm in Dalamud.AetheryteList
-                        .OrderBy(x => Aetherytes.GetRow(x.AetheryteData.GameData.RowId).Territory.Value.PlaceNameRegion.Row)
-                        .ThenBy(x => Aetherytes.GetRow(x.AetheryteData.GameData.RowId).PlaceName.Row)
+                        .OrderBy(x => Aetherytes.GetRow(x.AetheryteData.GameData!.RowId)!.Territory.Value!.PlaceNameRegion.Row)
+                        .ThenBy(x => Aetherytes.GetRow(x.AetheryteData.GameData!.RowId)!.PlaceName.Row)
                     )
                     {
                         if (
                             ImGui.Selectable(
-                                Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(itm.AetheryteData.GameData.RowId).PlaceName.Value?.Name.ToString())
+                                Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(itm.AetheryteData.GameData!.RowId)!.PlaceName.Value?.Name.ToString()!)
                             )
                         )
                         {

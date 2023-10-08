@@ -19,7 +19,7 @@ namespace MZRadialMenu.Config
         }
         public void Execute()
         {
-            MZRadialMenu.Instance.ExecuteCommand(this.Command);
+            MZRadialMenu.Instance!.ExecuteCommand(this.Command);
         }
         public override void Render(AdvRadialMenu radialMenu)
         {
