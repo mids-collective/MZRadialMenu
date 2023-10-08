@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Linq;
 
 using Dalamud;
-using Dalamud.Logging;
 using Dalamud.Plugin;
 using Dalamud.Utility.Signatures;
 using Dalamud.Hooking;

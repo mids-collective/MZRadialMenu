@@ -2,6 +2,7 @@ using MZRadialMenu.Attributes;
 using ImComponents;
 using ImGuiNET;
 using Newtonsoft.Json;
+
 namespace MZRadialMenu.Config;
 
 [WheelType("Wheel", true)]

@@ -4,7 +4,9 @@ using System.Linq;
 using System.Collections.Generic;
 using Dalamud.Plugin;
 using Dalamud.Game.Command;
+
 namespace MZRadialMenu.Attributes;
+
 #region PluginCommandManager
 public class PluginCommandManager<T> : IDisposable where T : IDalamudPlugin
 {

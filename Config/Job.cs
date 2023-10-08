@@ -1,14 +1,9 @@
 using System.Linq;
-
 using ImComponents;
 using ImGuiNET;
-
 using MZRadialMenu.Attributes;
-
 using Newtonsoft.Json;
-
 using Lumina.Excel.GeneratedSheets;
-using Dalamud.Logging;
 
 namespace MZRadialMenu.Config;
 

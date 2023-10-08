@@ -1,6 +1,7 @@
 using MZRadialMenu.Attributes;
 using ImGuiNET;
 using ImComponents;
+
 namespace MZRadialMenu.Config;
 
 [WheelType("Shortcut", false)]

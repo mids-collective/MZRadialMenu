@@ -5,6 +5,7 @@ using ImComponents;
 using MZRadialMenu.Attributes;
 using ImGuiNET;
 using Newtonsoft.Json;
+
 namespace MZRadialMenu.Config;
 
 [WheelType("Menu", false)]

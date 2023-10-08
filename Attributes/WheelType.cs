@@ -2,7 +2,9 @@ using System;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
+
 namespace MZRadialMenu.Attributes;
+
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
 public class WheelTypeAttribute : Attribute
 {

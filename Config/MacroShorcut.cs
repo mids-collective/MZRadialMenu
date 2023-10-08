@@ -10,6 +10,7 @@ using MZRadialMenu.Attributes;
 using MZRadialMenu.Structures;
 
 namespace MZRadialMenu.Config;
+
 //Virtual macros?
 //Need to limit text output macros
 [WheelType("Macro", false)]
