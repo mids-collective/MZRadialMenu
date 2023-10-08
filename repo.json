@@ -16,6 +16,9 @@
     "LoadPriority": 0,
     "LoadRequiredState": 0,
     "LoadSync": false,
+    "Tags": [
+      "UI"
+    ],
     "DownloadLinkInstall": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.1.0/MZRadialMenu.zip",
     "DownloadLinkTesting": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.1.0/MZRadialMenu.zip",
     "DownloadLinkUpdate": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.1.0/MZRadialMenu.zip",
