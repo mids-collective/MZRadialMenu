@@ -290,6 +290,7 @@ namespace MZRadialMenu
             Dalamud.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfig;
             Dalamud.PluginInterface.UiBuilder.Draw -= Draw;
             Dalamud.ClientState.Login -= handleLogin;
+            ExecuteMacroHook!.Dispose();
             commandManager.Dispose();
         }
 
