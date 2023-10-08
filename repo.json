@@ -6,7 +6,7 @@
       "InternalName": "MZRadialMenu",
       "AssemblyVersion": "0.1.0.0",
       "TestingAssemblyVersion": "0.1.0.0",
-      "RepoUrl": "https://github.com/myds-dalamud-plugins/MZRadialMenu",
+      "RepoUrl": "https://github.com/mids-collective/MZRadialMenu",
       "ApplicableVersion": "any",
       "DalamudApiLevel": 9,
       "IsHide": "False",
@@ -16,9 +16,9 @@
       "LoadPriority": 0,
       "LoadRequiredState": 0,
       "LoadSync": false,
-      "DownloadLinkInstall": "https://github.com/Minizbot2012/MZRadialMenu/releases/download/0.0.1.0/MZRadialMenu.zip",
-      "DownloadLinkTesting": "https://github.com/Minizbot2012/MZRadialMenu/releases/download/0.0.1.0/MZRadialMenu.zip",
-      "DownloadLinkUpdate": "https://github.com/Minizbot2012/MZRadialMenu/releases/download/0.0.1.0/MZRadialMenu.zip",
+      "DownloadLinkInstall": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.1.0/MZRadialMenu.zip",
+      "DownloadLinkTesting": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.1.0/MZRadialMenu.zip",
+      "DownloadLinkUpdate": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.1.0/MZRadialMenu.zip",
       "IconUrl": ""
     }
   ]
