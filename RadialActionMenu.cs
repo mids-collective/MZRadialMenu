@@ -218,30 +218,20 @@ namespace MZRadialMenu
         }
         private void InitCommands()
         {
+            Dalamud.GameInteropProvider.InitializeFromAttributes(this);
             uiModule = Framework.Instance()->GetUiModule();
             agentModule = uiModule->GetAgentModule();
             raptureShellModule = uiModule->GetRaptureShellModule();
             raptureMacroModule = uiModule->GetRaptureMacroModule();
-            Dalamud.GameInteropProvider.InitializeFromAttributes(this);
-            try
-            {
-                numCopiedMacroLinesPtr = Dalamud.SigScanner.ScanText("49 8D 5E 70 BF ?? 00 00 00") + 0x5;
-                numExecutedMacroLinesPtr = Dalamud.SigScanner.ScanText("41 83 F8 ?? 0F 8D ?? ?? ?? ?? 49 6B C8 68") + 0x3;
-            }
-            catch
-            {
-                Dalamud.PluginLog.Error("Failed to Load ExecuteMacro");
-            }
-            try
-            {
-                itemContextMenuAgent = GetAgentByInternalID(AgentId.InventoryContext);
+            numCopiedMacroLinesPtr = Dalamud.SigScanner.ScanText("49 8D 5E 70 BF ?? 00 00 00") + 0x5;
+            numExecutedMacroLinesPtr = Dalamud.SigScanner.ScanText("41 83 F8 ?? 0F 8D ?? ?? ?? ?? 49 6B C8 68") + 0x3;
 
-                usables = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>()!.Where(i => i.ItemAction.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
-                    .Concat(Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
-                    .ToDictionary(kv => kv.Key, kv => kv.Value);
-                usables[aetherCompassID] = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.GetRow(aetherCompassID)?.Name.ToString().ToLower()!;
-            }
-            catch { Dalamud.PluginLog.Error("Failed to load UseItem"); }
+            itemContextMenuAgent = GetAgentByInternalID(AgentId.InventoryContext);
+
+            usables = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>()!.Where(i => i.ItemAction.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
+                .Concat(Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+            usables[aetherCompassID] = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.GetRow(aetherCompassID)?.Name.ToString().ToLower()!;
         }
 
         public void ExecuteCommand(string command)
