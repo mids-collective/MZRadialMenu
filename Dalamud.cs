@@ -20,7 +20,7 @@ namespace MZRadialMenu
         [PluginService] public static IClientState ClientState { get; private set; } = null!;
         [PluginService] public static ICommandManager Commands { get; private set; } = null!;
         [PluginService] public static IChatGui Chat { get; private set; } = null!;
-        [PluginService] public static SigScanner SigScanner { get; private set; } = null!;
+        [PluginService] public static ISigScanner SigScanner { get; private set; } = null!;
         // @formatter:on
     }
 }
