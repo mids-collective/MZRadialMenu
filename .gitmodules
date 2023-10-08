@@ -1,3 +1,4 @@
 [submodule "lib/ImComponents"]
 	path = lib/ImComponents
 	url = https://github.com/Minizbot2012/ImComponents
+	branch = main
