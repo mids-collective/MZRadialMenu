@@ -4,11 +4,10 @@
   "Description": "A radial menu implemented with ImComponents",
   "Punchline": "Radial Menu 'uff Said",
   "InternalName": "MZRadialMenu",
-  "AssemblyVersion": "1.0.0.0",
   "ApplicableVersion": "any",
-  "RepoUrl": "https://github.com/mids-collective/MZRadialMenu",
   "DalamudApiLevel": 9,
   "Tags": [
     "UI"
-  ]
+  ],
+  "RepoUrl": "https://github.com/mids-collective/MZRadialMenu"
 }

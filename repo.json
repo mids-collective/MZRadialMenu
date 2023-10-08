@@ -2,13 +2,15 @@
   {
     "Author": "Minizbot2012",
     "Name": "MZRadialMenu",
-    "Description": "Radial Menu 'Nuff Said.",
+    "Description": "A radial menu implemented with ImComponents",
+    "Punchline": "Radial Menu 'uff Said",
     "InternalName": "MZRadialMenu",
-    "AssemblyVersion": "0.0.1.1",
-    "TestingAssemblyVersion": "0.0.1.1",
-    "RepoUrl": "https://github.com/mids-collective/MZRadialMenu",
     "ApplicableVersion": "any",
     "DalamudApiLevel": 9,
+    "Tags": [
+      "UI"
+    ],
+    "RepoUrl": "https://github.com/mids-collective/MZRadialMenu",
     "IsHide": "False",
     "IsTestingExclusive": "False",
     "DownloadCount": 0,
@@ -16,9 +18,8 @@
     "LoadPriority": 0,
     "LoadRequiredState": 0,
     "LoadSync": false,
-    "Tags": [
-      "UI"
-    ],
+    "AssemblyVersion": "0.0.1.1",
+    "TestingAssemblyVersion": "0.0.1.1",
     "DownloadLinkInstall": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.1.1/MZRadialMenu.zip",
     "DownloadLinkTesting": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.1.1/MZRadialMenu.zip",
     "DownloadLinkUpdate": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.1.1/MZRadialMenu.zip",
