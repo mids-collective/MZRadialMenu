@@ -16,8 +16,6 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '7.x.x'
-      - name: Restore dependencies
-        run: dotnet restore
       - name: Download Dalamud
         run: |
           Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/stg/latest.zip -OutFile latest.zip
@@ -25,7 +23,7 @@ jobs:
       - name: Build
         run: |
           $ver = '${{ github.ref_name }}' -replace 'testing_'
-          invoke-expression 'dotnet build --no-restore --configuration Debug --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver'
+          invoke-expression 'dotnet build --configuration Debug --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver'
       - name: write version into json
         run: |
           $ver = '${{ github.ref_name }}' -replace 'testing_'
@@ -40,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v2.2.1
         with:
           path: |
-            .//bin/Debug/*
+            ./bin/Debug/*
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
