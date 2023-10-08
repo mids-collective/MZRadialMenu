@@ -7,14 +7,15 @@
     <Platforms>x64</Platforms>
     <LangVersion>latest</LangVersion>
     <Authors>Minizbot2012</Authors>
+    <FileVersion>1.0.0.0</FileVersion>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 </Project>

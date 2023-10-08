@@ -2,10 +2,11 @@
   "Author": "Minizbot2012",
   "Name": "MZRadialMenu",
   "Description": "A radial menu implemented with ImComponents",
-  "Punchline": "Radial Menu 'nuff said",
   "InternalName": "MZRadialMenu",
-  "RepoUrl": "https://github.com/mids-collective/MZRadialMenu",
+  "AssemblyVersion": "1.0.0.0",
   "ApplicableVersion": "any",
+  "RepoUrl": "https://github.com/mids-collective/MZRadialMenu",
+  "DalamudApiLevel": 9,
   "Tags": [
     "UI"
   ]
