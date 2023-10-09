@@ -32,19 +32,14 @@ namespace MZRadialMenu;
 public unsafe class MZRadialMenu : IDalamudPlugin
 {
     public static MZRadialMenu? Instance;
-    public string Name => "MZRadialMenu";
     private Wheels ActiveConfig;
     private Wheels ConfigWindow;
+    private Dictionary<uint, string> usables = new();
     private PluginCommandManager<MZRadialMenu> commandManager;
     private bool ConfigOpen = false;
-    private uint retryItem = 0;
-    private Dictionary<uint, string>? usables = null;
-    //Agents
-    private nint itemContextMenuAgent;
     private AgentModule* agentModule;
     private UIModule* uiModule;
     private bool IsGameTextInputActive => uiModule->GetRaptureAtkModule()->AtkModule.IsTextInputActive();
-    private nint GetAgentByInternalID(AgentId id) => (nint)agentModule->GetAgentByInternalId(id);
     // Macro Execution
     public delegate void ExecuteMacroDelegate(RaptureShellModule* raptureShellModule, nint macro);
     [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 4D 28")]
@@ -73,39 +68,37 @@ public unsafe class MZRadialMenu : IDalamudPlugin
                 SafeMemory.WriteBytes(numExecutedMacroLinesPtr, new[] { value });
         }
     }
-    //Use Item
-    [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 89 7C 24 38")]
-    private static delegate* unmanaged<nint, uint, uint, uint, short, void> useItem;
-    [Signature("E8 ?? ?? ?? ?? 44 8B 4B 2C")]
-    private static delegate* unmanaged<uint, uint, uint> getActionID;
-    private const int aetherCompassID = 2_001_886;
+    private const int aetherCompassID = 2001886;
     // Command Execution
     public delegate void ProcessChatBoxDelegate(UIModule* uiModule, nint message, nint unused, byte a4);
     [Signature("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9")]
     public static ProcessChatBoxDelegate? ProcessChatBox;
     private AdvRadialMenu MyRadialMenu;
-    private void RenderWheel()
+    private void DrawWheel()
     {
-        for (int i = 0; i < ActiveConfig!.WheelSet.Count; i++)
+        if (DalamudApi.ClientState.IsLoggedIn)
         {
-            var Config = ActiveConfig.WheelSet[i];
-            if (Config.key.key != 0x0)
+            for (int i = 0; i < ActiveConfig!.WheelSet.Count; i++)
             {
-                var open = DalamudApi.Keys[Config.key.key];
-                if (open && !ActiveConfig.WheelSet.Any(x => x.IsOpen) && uiModule != null && !IsGameTextInputActive)
+                var Config = ActiveConfig.WheelSet[i];
+                if (Config.key.key != 0x0)
                 {
-                    Config.IsOpen = true;
-                    ImGui.OpenPopup("##Wheel", ImGuiPopupFlags.NoOpenOverExistingPopup);
-                }
-                Config.Render(MyRadialMenu, open);
-                if (!open)
-                {
-                    Config.IsOpen = false;
+                    var open = DalamudApi.Keys[Config.key.key];
+                    if (open && !ActiveConfig.WheelSet.Any(x => x.IsOpen) && uiModule != null && !IsGameTextInputActive)
+                    {
+                        Config.IsOpen = true;
+                        ImGui.OpenPopup("##Wheel", ImGuiPopupFlags.NoOpenOverExistingPopup);
+                    }
+                    Config.Render(MyRadialMenu, open);
+                    if (!open)
+                    {
+                        Config.IsOpen = false;
+                    }
                 }
             }
         }
     }
-    private void ConfigRender()
+    private void DrawConfig()
     {
         if (ConfigOpen)
         {
@@ -188,11 +181,6 @@ public unsafe class MZRadialMenu : IDalamudPlugin
             ImGui.End();
         }
     }
-    private void Draw()
-    {
-        ConfigRender();
-        RenderWheel();
-    }
 
     public MZRadialMenu(DalamudPluginInterface dpi)
     {
@@ -202,60 +190,59 @@ public unsafe class MZRadialMenu : IDalamudPlugin
         commandManager = new PluginCommandManager<MZRadialMenu>(this);
         ActiveConfig = (Wheels?)DalamudApi.PluginInterface.GetPluginConfig() ?? new();
         ConfigWindow = ActiveConfig.DeepCopy();
-        DalamudApi.PluginInterface.UiBuilder.Draw += Draw;
+        DalamudApi.PluginInterface.UiBuilder.Draw += DrawConfig;
+        DalamudApi.PluginInterface.UiBuilder.Draw += DrawWheel;
         DalamudApi.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfig;
+        DalamudApi.ClientState.Login += InitCommands;
+        DalamudApi.ClientState.Login += InitUsables;
         if (DalamudApi.ClientState.IsLoggedIn)
         {
             InitCommands();
             InitUsables();
         }
-        DalamudApi.ClientState.Login += InitCommands;
-        DalamudApi.ClientState.Login += InitUsables;
     }
 
     private void ToggleConfig()
     {
         ConfigOpen = !ConfigOpen;
     }
+
     [Command("/pwheels")]
     [HelpMessage("Show or hide plugin configuation")]
     private void ToggleConfig(string cmd, string args)
     {
         ToggleConfig();
     }
+
     public void UseItem(uint id)
     {
-        if (id == 0 || !usables!.ContainsKey(id is >= 1_000_000 and < 2_000_000 ? id - 1_000_000 : id)) return;
-
+        if (id == 0 || !usables.ContainsKey(id is >= 1_000_000 and < 2_000_000 ? id - 1_000_000 : id)) return;
         // Aether Compass
         if (id == aetherCompassID)
         {
-            ActionManager.Instance()->UseAction(ActionType.Action, 26988);
-            return;
+            if (ActionManager.Instance()->UseAction(ActionType.Action, 26988)) return;
         }
-
-        if (retryItem == 0 && id < 2_000_000)
+        else if (usables[id] == "wondrous tails")
         {
-            var actionID = getActionID(2, id);
-            if (actionID == 0)
-            {
-                retryItem = id;
-                return;
-            }
+            if (ActionManager.Instance()->UseAction(ActionType.KeyItem, id)) return;
         }
-
-        useItem(itemContextMenuAgent, id, 9999, 0, 0);
+        else
+        {
+            if (ActionManager.Instance()->UseAction(ActionType.Item, id)) return;
+            if (ActionManager.Instance()->UseAction(ActionType.Item, id)) return;
+        }
     }
+
     public void UseItem(string name)
     {
+        if (usables.Count == 0) InitUsables();
         if (string.IsNullOrWhiteSpace(name)) return;
-        if (usables == null) InitUsables();
 
         var newName = name.Replace("\uE03C", ""); // Remove HQ Symbol
         var useHQ = newName != name;
         newName = newName.ToLower().Trim(' ');
 
-        UseItem(usables!.First(i => i.Value == newName).Key + (uint)(useHQ ? 1_000_000 : 0));
+        UseItem(usables.First(i => i.Value == newName).Key + (uint)(useHQ ? 1_000_000 : 0));
     }
 
     private void InitUsables()
@@ -264,6 +251,8 @@ public unsafe class MZRadialMenu : IDalamudPlugin
             .Concat(DalamudApi.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
             .ToDictionary(kv => kv.Key, kv => kv.Value);
         usables[aetherCompassID] = DalamudApi.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.GetRow(aetherCompassID)?.Name.ToString().ToLower()!;
+
+        DalamudApi.PluginLog.Info("Usables Initialized");
     }
 
     private void InitCommands()
@@ -276,8 +265,6 @@ public unsafe class MZRadialMenu : IDalamudPlugin
         raptureMacroModule = uiModule->GetRaptureMacroModule();
         numCopiedMacroLinesPtr = DalamudApi.SigScanner.ScanText("49 8D 5E 70 BF ?? 00 00 00") + 0x5;
         numExecutedMacroLinesPtr = DalamudApi.SigScanner.ScanText("41 83 F8 ?? 0F 8D ?? ?? ?? ?? 49 6B C8 68") + 0x3;
-
-        itemContextMenuAgent = GetAgentByInternalID(AgentId.InventoryContext);
 
         ExecuteMacroHook!.Enable();
 
@@ -327,12 +314,13 @@ public unsafe class MZRadialMenu : IDalamudPlugin
     {
         NumCopiedMacroLines = 15;
         NumExecutedMacroLines = 15;
+        commandManager.Dispose();
         DalamudApi.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfig;
-        DalamudApi.PluginInterface.UiBuilder.Draw -= Draw;
+        DalamudApi.PluginInterface.UiBuilder.Draw -= DrawWheel;
+        DalamudApi.PluginInterface.UiBuilder.Draw -= DrawConfig;
         DalamudApi.ClientState.Login -= InitCommands;
         DalamudApi.ClientState.Login -= InitUsables;
         ExecuteMacroHook!.Dispose();
-        commandManager.Dispose();
     }
 
     public static void ExecuteMacroDetour(RaptureShellModule* raptureShellModule, nint macro)
