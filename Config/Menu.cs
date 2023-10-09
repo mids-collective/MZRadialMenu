@@ -43,7 +43,7 @@ public class Menu : BaseItem
                     continue;
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Copy Tree"))
+                if (ImGui.Button("Export Item"))
                 {
                     var json = JsonConvert.SerializeObject(this.Sublist[i]);
                     var exp = $"MZRM_({Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Sublist[i].GetType().AssemblyQualifiedName!))})_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
@@ -74,7 +74,7 @@ public class Menu : BaseItem
                 }
             }
             ImGui.SameLine();
-            if (ImGui.Button("Paste Tree"))
+            if (ImGui.Button("Import Item"))
             {
                 var clip = ImGui.GetClipboardText();
                 var regex = new Regex(@"MZRM_\((.*)\)_\((.*)\)");
