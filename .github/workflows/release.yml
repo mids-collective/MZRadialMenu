@@ -58,9 +58,9 @@ jobs:
           $json = Get-Content -Raw $path | ConvertFrom-Json
           $json[0].AssemblyVersion = $ver
           $json[0].TestingAssemblyVersion = $ver
-          $json[0].DownloadLinkInstall = ${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}
-          $json[0].DownloadLinkTesting = ${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}
-          $json[0].DownloadLinkUpdate = ${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}
+          $json[0].DownloadLinkInstall = $url
+          $json[0].DownloadLinkTesting = $url
+          $json[0].DownloadLinkUpdate = $url
           $content = $json | ConvertTo-Json -AsArray
           set-content -Path $path -Value $content
       - name: Commit repo.json
