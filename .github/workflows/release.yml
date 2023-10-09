@@ -5,15 +5,18 @@ on:
     tags-ignore:
       - testing_*
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.x.x'
       - name: Download Dalamud
@@ -35,31 +38,16 @@ jobs:
       - name: Archive
         run: Compress-Archive -Path bin/Release/* -DestinationPath MZRadialMenu.zip
       - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2.2.1
+        uses: actions/upload-artifact@v3
         with:
           path: |
             bin/Release/*
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: MZRadialMenu ${{ github.ref }}
-          draft: false
-          prerelease: false
-      - name: Upload Release Asset
+      - name: Upload Release
         id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./MZRadialMenu.zip
-          asset_name: MZRadialMenu.zip
-          asset_content_type: application/zip
-
+          files: MZRadialMenu.zip
+          token: {{ secrets.GITHUB_TOKEN }}
       - name: Write out repo.json
         run: |
           $ver = '${{ github.ref_name }}'
@@ -72,7 +60,6 @@ jobs:
           $json[0].DownloadLinkUpdate = $json.DownloadLinkUpdate -replace '[^/]+/MZRadialMenu.zip',"$ver/MZRadialMenu.zip"
           $content = $json | ConvertTo-Json -AsArray
           set-content -Path $path -Value $content
-
       - name: Commit repo.json
         run: |
           git config --global user.name "Actions User"
