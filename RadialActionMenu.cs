@@ -22,11 +22,9 @@ using MZRadialMenu.Config;
 using MZRadialMenu.Extensions;
 
 using Newtonsoft.Json;
+
 using ImComponents;
 using ImGuiNET;
-using Microsoft.VisualBasic;
-
-
 
 namespace MZRadialMenu;
 
@@ -158,7 +156,7 @@ public unsafe class MZRadialMenu : IDalamudPlugin
                 {
                     clip = clip[6..^1];
                     var obj = JsonConvert.DeserializeObject<Wheel>(Encoding.UTF8.GetString(Convert.FromBase64String(clip)))!;
-                    obj.UUID = System.Guid.NewGuid().ToString();
+                    obj.UUID = Guid.NewGuid().ToString();
                     ConfigWindow.WheelSet.Add(obj);
                 }
             }
