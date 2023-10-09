@@ -220,16 +220,15 @@ public unsafe class MZRadialMenu : IDalamudPlugin
         // Aether Compass
         if (id == aetherCompassID)
         {
-            if (ActionManager.Instance()->UseAction(ActionType.Action, 26988)) return;
+            ActionManager.Instance()->UseAction(ActionType.Action, 26988);
         }
         else if (usables[id] == "wondrous tails")
         {
-            if (ActionManager.Instance()->UseAction(ActionType.KeyItem, id)) return;
+            ActionManager.Instance()->UseAction(ActionType.KeyItem, id);
         }
         else
         {
-            if (ActionManager.Instance()->UseAction(ActionType.Item, id)) return;
-            if (ActionManager.Instance()->UseAction(ActionType.Item, id)) return;
+            ActionManager.Instance()->UseAction(ActionType.Item, id);
         }
     }
 
