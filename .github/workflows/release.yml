@@ -8,9 +8,6 @@ on:
 permissions:
   contents: write
 
-env:
-  PROJECT_NAME: MZRadialMenu
-
 jobs:
   build:
     runs-on: windows-latest
@@ -33,13 +30,13 @@ jobs:
       - name: Json Update
         run: |
           $ver = '${{ github.ref_name }}'
-          $path = "./bin/Release/$PROJECT_NAME.json"
+          $path = './bin/Release/MZRadialMenu.json'
           $json = Get-Content -Raw $path | ConvertFrom-Json
           $json.AssemblyVersion = $ver
           $content = $json | ConvertTo-Json
           set-content -Path $path -Value $content
       - name: Archive
-        run: Compress-Archive -Path bin/Release/* -DestinationPath $PROJECT_NAME.zip
+        run: Compress-Archive -Path bin/Release/* -DestinationPath MZRadialMenu.zip
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -49,8 +46,9 @@ jobs:
         id: upload-release
         uses: softprops/action-gh-release@v1
         with:
-          files: $PROJECT_NAME.zip
+          files: MZRadialMenu.zip
           token: ${{ secrets.GITHUB_TOKEN }}
+          name: MZRadialMenu ${{ github.ref_name }}
       - name: Write out repo.json
         run: |
           $ver = '${{ github.ref_name }}'
