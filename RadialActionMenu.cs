@@ -37,7 +37,7 @@ public unsafe class MZRadialMenu : IDalamudPlugin
     private Dictionary<uint, string> usables = new();
     private PluginCommandManager<MZRadialMenu> commandManager;
     private bool ConfigOpen = false;
-    private AgentModule* agentModule;
+    private static AgentModule* agentModule;
     private UIModule* uiModule;
     private bool IsGameTextInputActive => uiModule->GetRaptureAtkModule()->AtkModule.IsTextInputActive();
     // Macro Execution
@@ -228,9 +228,23 @@ public unsafe class MZRadialMenu : IDalamudPlugin
         }
         else
         {
-            ActionManager.Instance()->UseAction(ActionType.Item, id);
+            var actionID = getActionID(2, id);
+            if (actionID == 0)
+            {
+                actionID = id;
+            }
+            // Why??
+            // ActionManager.Instance()->UseAction(ActionType.Item, actionID);
+            useItem(itemContextMenuAgent, actionID, 9999, 0, 0);
         }
     }
+
+    [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 89 7C 24 38")]
+    private static delegate* unmanaged<nint, uint, uint, uint, short, void> useItem;
+    public static nint itemContextMenuAgent;
+    private static RaptureAtkUnitManager* raptureAtkUnitManager;
+    [Signature("E8 ?? ?? ?? ?? 44 8B 4B 2C")]
+    private static delegate* unmanaged<uint, uint, uint> getActionID;
 
     public void UseItem(string name)
     {
@@ -243,6 +257,8 @@ public unsafe class MZRadialMenu : IDalamudPlugin
 
         UseItem(usables.First(i => i.Value == newName).Key + (uint)(useHQ ? 1_000_000 : 0));
     }
+
+    public static nint GetAgentByInternalID(AgentId id) => (nint)agentModule->GetAgentByInternalId(id);
 
     private void InitUsables()
     {
@@ -260,6 +276,8 @@ public unsafe class MZRadialMenu : IDalamudPlugin
 
         uiModule = Framework.Instance()->GetUiModule();
         agentModule = uiModule->GetAgentModule();
+        itemContextMenuAgent = GetAgentByInternalID(AgentId.InventoryContext);
+
         raptureShellModule = uiModule->GetRaptureShellModule();
         raptureMacroModule = uiModule->GetRaptureMacroModule();
         numCopiedMacroLinesPtr = DalamudApi.SigScanner.ScanText("49 8D 5E 70 BF ?? 00 00 00") + 0x5;
