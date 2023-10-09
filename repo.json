@@ -18,11 +18,11 @@
     "LoadPriority": 0,
     "LoadRequiredState": 0,
     "LoadSync": false,
-    "AssemblyVersion": "0.0.4.0",
-    "TestingAssemblyVersion": "0.0.4.0",
-    "DownloadLinkInstall": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.4.0/MZRadialMenu.zip",
-    "DownloadLinkTesting": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.4.0/MZRadialMenu.zip",
-    "DownloadLinkUpdate": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.4.0/MZRadialMenu.zip",
+    "AssemblyVersion": "0.0.5.0",
+    "TestingAssemblyVersion": "0.0.5.0",
+    "DownloadLinkInstall": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.5.0/MZRadialMenu.zip",
+    "DownloadLinkTesting": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.5.0/MZRadialMenu.zip",
+    "DownloadLinkUpdate": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.5.0/MZRadialMenu.zip",
     "IconUrl": ""
   }
 ]
