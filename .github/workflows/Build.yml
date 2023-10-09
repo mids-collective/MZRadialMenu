@@ -27,7 +27,7 @@ jobs:
       - name: Archive
         run: Compress-Archive -Path bin/Release/* -DestinationPath MZRadialMenu.zip
       - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2.2.1
+        uses: actions/upload-artifact@v3
         with:
           path: |
             bin/Release/*

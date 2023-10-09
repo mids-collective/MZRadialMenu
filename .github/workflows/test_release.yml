@@ -5,6 +5,12 @@ on:
     tags:
       - testing_*
 
+permissions:
+  contents: write
+
+env:
+  PROJECT_NAME: MZRadialMenu
+
 jobs:
   build:
     runs-on: windows-latest
@@ -27,23 +33,23 @@ jobs:
       - name: Json Update
         run: |
           $ver = '${{ github.ref_name }}' -replace 'testing_'
-          $path = './bin/Debug/MZRadialMenu.json'
+          $path = ""./bin/Debug/$PROJECT_NAME.json"
           $json = Get-Content -Raw $path | ConvertFrom-Json
           $json.AssemblyVersion = $ver
           $content = $json | ConvertTo-Json
           set-content -Path $path -Value $content
       - name: Archive
-        run: Compress-Archive -Path MZRadialMenu/bin/Debug/* -DestinationPath MZRadialMenu.zip
+        run: Compress-Archive -Path bin/Debug/* -DestinationPath $PROJECT_NAME.zip
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3
         with:
           path: |
             ./bin/Debug/*
       - name: Create & Upload Release
-        id: upload-release-asset
+        id: upload-release
         uses: softprops/action-gh-release@v1
         with:
-          files: MZRadialMenu.zip
+          files: $PROJECT_NAME.zip
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Write out repo.json
         run: |
@@ -52,7 +58,7 @@ jobs:
           $path = './repo.json'
           $json = Get-Content -Raw $path | ConvertFrom-Json
           $json[0].TestingAssemblyVersion = $ver          
-          $json[0].DownloadLinkTesting = $json.DownloadLinkTesting -replace '[^/]+/MZRadialMenu.zip',"$verT/MZRadialMenu.zip"
+          $json[0].DownloadLinkTesting = ${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}
           $content = $json | ConvertTo-Json -AsArray
           set-content -Path $path -Value $content
 
