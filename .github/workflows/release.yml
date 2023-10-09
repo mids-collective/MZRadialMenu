@@ -27,7 +27,7 @@ jobs:
         run: |
           $ver = '${{ github.ref_name }}'
           invoke-expression 'dotnet build --configuration Release --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver'
-      - name: write version into jsons
+      - name: Json Update
         run: |
           $ver = '${{ github.ref_name }}'
           $path = './bin/Release/MZRadialMenu.json'
