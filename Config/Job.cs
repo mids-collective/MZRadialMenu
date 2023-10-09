@@ -10,7 +10,7 @@ namespace MZRadialMenu.Config;
 [WheelType("Job", false)]
 public class Job : BaseItem
 {
-    public override void RenderConfig()
+    public override bool RenderConfig()
     {
         ImGui.PushID(this.UUID);
         if (ImGui.BeginCombo("Job / Class", this.Title))
@@ -29,6 +29,7 @@ public class Job : BaseItem
             ImGui.EndCombo();
         }
         ImGui.PopID();
+        return true;
     }
     public override void Render(AdvRadialMenu radialMenu)
     {

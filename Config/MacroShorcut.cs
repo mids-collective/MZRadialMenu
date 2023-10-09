@@ -16,7 +16,7 @@ namespace MZRadialMenu.Config;
 [WheelType("Macro", false)]
 public class MacroShortcut : BaseItem
 {
-    public override void RenderConfig()
+    public override bool RenderConfig()
     {
         ImGui.PushID(this.UUID);
         if (ImGui.TreeNode(this.UUID, this.Title))
@@ -29,6 +29,7 @@ public class MacroShortcut : BaseItem
             ImGui.TreePop();
         }
         ImGui.PopID();
+        return true;
     }
     public unsafe void Execute()
     {

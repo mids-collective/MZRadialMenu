@@ -7,7 +7,7 @@ namespace MZRadialMenu.Config;
 [WheelType("Shortcut", false)]
 public class Shortcut : BaseItem
 {
-    public override void RenderConfig()
+    public override bool RenderConfig()
     {
         ImGui.PushID(this.UUID);
         if (ImGui.TreeNode(this.UUID, this.Title))
@@ -17,6 +17,7 @@ public class Shortcut : BaseItem
             ImGui.TreePop();
         }
         ImGui.PopID();
+        return true;
     }
     public void Execute()
     {

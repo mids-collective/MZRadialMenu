@@ -6,15 +6,16 @@ using MZRadialMenu.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ImComponents;
+using ImGuiNET;
+using System.Drawing;
 
 namespace MZRadialMenu.Config;
 
 [JsonConverter(typeof(Converter))]
 public abstract class BaseItem
 {
-    public abstract void RenderConfig();
+    public abstract bool RenderConfig();
     public abstract void Render(AdvRadialMenu radialMenu);
-    [JsonIgnore]
     public string UUID = System.Guid.NewGuid().ToString();
     public string Title = string.Empty;
 }

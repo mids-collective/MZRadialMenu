@@ -13,8 +13,9 @@ namespace MZRadialMenu.Config;
 [WheelType("Menu", false)]
 public class Menu : BaseItem
 {
-    public void RawRender()
+    public bool RawRender()
     {
+        bool show_buttons = true;
         ImGui.InputText("Title", ref this.Title, 0xF);
         for (int i = 0; i < this.Sublist.Count; i++)
         {
@@ -42,56 +43,64 @@ public class Menu : BaseItem
                     continue;
                 }
                 ImGui.SameLine();
-                if (ImGui.Button("Export Tree"))
+                if (ImGui.Button("Copy Tree"))
                 {
                     var json = JsonConvert.SerializeObject(this.Sublist[i]);
                     var exp = $"MZRM_({Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Sublist[i].GetType().AssemblyQualifiedName!))})_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
                     ImGui.SetClipboardText(exp);
                 }
                 ImGui.SameLine();
-                this.Sublist[i].RenderConfig();
+                show_buttons &= this.Sublist[i].RenderConfig();
             }
             ImGui.PopID();
         }
-        int c = 0;
-        foreach (var t in Types)
+        if (show_buttons)
         {
-            if (!t.Value.Hide)
+            int c = 0;
+            foreach (var t in Types)
             {
-                ImGui.PushID(this.UUID);
-                if (ImGui.Button($"+ {t.Value.Name}"))
+                if (!t.Value.Hide)
                 {
-                    this.Sublist.Add((Activator.CreateInstance(t.Key) as BaseItem)!);
+                    ImGui.PushID(this.UUID);
+                    if (ImGui.Button($"+ {t.Value.Name}"))
+                    {
+                        this.Sublist.Add((Activator.CreateInstance(t.Key) as BaseItem)!);
+                    }
+                    if (++c != Types.Count - 1)
+                    {
+                        ImGui.SameLine();
+                    }
+                    ImGui.PopID();
                 }
-                if (++c != Types.Count - 1)
-                {
-                    ImGui.SameLine();
-                }
-                ImGui.PopID();
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Paste Tree"))
+            {
+                var clip = ImGui.GetClipboardText();
+                var regex = new Regex(@"MZRM_\((.*)\)_\((.*)\)");
+                var matches = regex.Match(clip);
+                Dalamud.PluginLog.Info(matches.Groups[1].Captures[0].Value);
+                Dalamud.PluginLog.Info(matches.Groups[2].Captures[0].Value);
+                var typ = Type.GetType(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[1].Captures[0].Value)));
+                var obj = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[2].Captures[0].Value)), typ!);
+                (obj as BaseItem)!.UUID = System.Guid.NewGuid().ToString();
+                this.Sublist.Add((obj as BaseItem)!);
             }
         }
-        ImGui.SameLine();
-        if (ImGui.Button("Import Tree"))
-        {
-            var clip = ImGui.GetClipboardText();
-            var regex = new Regex(@"MZRM_\((.*)\)_\((.*)\)");
-            var matches = regex.Match(clip);
-            Dalamud.PluginLog.Info(matches.Groups[1].Captures[0].Value);
-            Dalamud.PluginLog.Info(matches.Groups[2].Captures[0].Value);
-            var typ = Type.GetType(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[1].Captures[0].Value)));
-            var obj = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[2].Captures[0].Value)), typ!);
-            this.Sublist.Add((obj as BaseItem)!);
-        }
+        return show_buttons;
     }
-    public override void RenderConfig()
+    public override bool RenderConfig()
     {
+        bool show_buttons = true;
         ImGui.PushID(this.UUID);
         if (ImGui.TreeNode(this.UUID, this.Title))
         {
+            show_buttons = false;
             this.RawRender();
             ImGui.TreePop();
         }
         ImGui.PopID();
+        return show_buttons;
     }
     public override void Render(AdvRadialMenu radialMenu)
     {

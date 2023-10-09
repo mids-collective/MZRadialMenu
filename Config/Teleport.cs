@@ -30,7 +30,7 @@ public class Teleport : BaseItem
         Telepo.Instance()->Teleport(this.TelepoID, this.TelepoSubID);
         return;
     }
-    public override void RenderConfig()
+    public override bool RenderConfig()
     {
         ImGui.PushID(this.UUID);
         if (ImGui.TreeNode(this.UUID, this.Title))
@@ -66,6 +66,7 @@ public class Teleport : BaseItem
             }
         }
         ImGui.PopID();
+        return true;
     }
     public override void Render(AdvRadialMenu radialMenu)
     {

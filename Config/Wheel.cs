@@ -26,16 +26,19 @@ public class Wheel : Menu
             }
         }
     }
-    public override void RenderConfig()
+    public override bool RenderConfig()
     {
+        bool show_buttons = true;
         ImGui.PushID(this.UUID);
         if (ImGui.TreeNode(this.UUID, this.Title))
         {
+            show_buttons = false;
             this.key.Render();
             base.RawRender();
             ImGui.TreePop();
         }
         ImGui.PopID();
+        return show_buttons;
     }
     public HotkeyButton key = new();
     [JsonIgnore]

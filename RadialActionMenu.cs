@@ -24,6 +24,7 @@ using MZRadialMenu.Extensions;
 using Newtonsoft.Json;
 using ImComponents;
 using ImGuiNET;
+using Microsoft.VisualBasic;
 
 
 
@@ -110,6 +111,9 @@ public unsafe class MZRadialMenu : IDalamudPlugin
         if (ConfigOpen)
         {
             ImGui.Begin("MZ Radial Menu Config", ref ConfigOpen);
+            var size = ImGui.GetContentRegionAvail();
+            size.Y -= 30;
+            ImGui.BeginChild($"Configuration", size);
             for (int c = 0; c < ConfigWindow!.WheelSet.Count; c++)
             {
                 var Config = ConfigWindow.WheelSet[c];
@@ -140,6 +144,8 @@ public unsafe class MZRadialMenu : IDalamudPlugin
 
                 ImGui.PopID();
             }
+            ImGui.EndChild();
+            ImGui.Separator();
             if (ImGui.Button("New Wheel"))
             {
                 ConfigWindow.WheelSet.Add(new Wheel());
@@ -152,13 +158,22 @@ public unsafe class MZRadialMenu : IDalamudPlugin
                 {
                     clip = clip[6..^1];
                     var obj = JsonConvert.DeserializeObject<Wheel>(Encoding.UTF8.GetString(Convert.FromBase64String(clip)))!;
+                    obj.UUID = System.Guid.NewGuid().ToString();
                     ConfigWindow.WheelSet.Add(obj);
                 }
             }
             ImGui.SameLine();
+            var pos = ImGui.GetCursorPos();
+            pos.X = size.X - 220;
+            ImGui.SetCursorPos(pos);
             if (ImGui.Button("Save and Close"))
             {
                 ConfigOpen = false;
+                ActiveConfig = ConfigWindow.DeepCopy();
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Save"))
+            {
                 ActiveConfig = ConfigWindow.DeepCopy();
             }
             ImGui.SameLine();
