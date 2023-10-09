@@ -50,6 +50,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: MZRadialMenu ${{ github.ref_name }}
       - name: Write out repo.json
+        env:
+          url: ${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}
         run: |
           $ver = '${{ github.ref_name }}'
           $path = './repo.json'
