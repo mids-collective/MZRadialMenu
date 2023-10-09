@@ -23,22 +23,22 @@ public class Teleport : BaseItem
         {
             return;
         }
-        if (DalamudApi.ClientState.LocalPlayer.HomeWorld.Id != DalamudApi.ClientState.LocalPlayer.CurrentWorld.Id && this.IsHouse)
+        if (DalamudApi.ClientState.LocalPlayer.HomeWorld.Id != DalamudApi.ClientState.LocalPlayer.CurrentWorld.Id && IsHouse)
         {
             DalamudApi.Chat.PrintError($"Cannot teleport to housing while using visiting other worlds!");
         }
-        Telepo.Instance()->Teleport(this.TelepoID, this.TelepoSubID);
+        Telepo.Instance()->Teleport(TelepoID, TelepoSubID);
         return;
     }
     public override bool RenderConfig()
     {
-        ImGui.PushID(this.UUID);
-        if (ImGui.TreeNode(this.UUID, this.Title))
+        ImGui.PushID(UUID);
+        if (ImGui.TreeNode(UUID, Title))
         {
-            ImGui.InputText("Title", ref this.Title, 0xF);
+            ImGui.InputText("Title", ref Title, 0xF);
             if (
                 ImGui.BeginCombo(
-                    "Teleport", DalamudApi.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(this.TelepoID)!.PlaceName.Value?.Name.ToString()!)
+                    "Teleport", DalamudApi.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(TelepoID)!.PlaceName.Value?.Name.ToString()!)
                 )
             )
             {
@@ -53,11 +53,11 @@ public class Teleport : BaseItem
                         )
                     )
                     {
-                        this.TelepoID = itm.AetheryteId;
-                        this.TelepoSubID = itm.SubIndex;
-                        this.IsHouse = itm.IsSharedHouse || itm.IsAppartment || itm.Ward != 0 || itm.Plot != 0;
+                        TelepoID = itm.AetheryteId;
+                        TelepoSubID = itm.SubIndex;
+                        IsHouse = itm.IsSharedHouse || itm.IsAppartment || itm.Ward != 0 || itm.Plot != 0;
                     }
-                    if (itm.AetheryteId == this.TelepoID && itm.SubIndex == this.TelepoSubID)
+                    if (itm.AetheryteId == TelepoID && itm.SubIndex == TelepoSubID)
                     {
                         ImGui.SetItemDefaultFocus();
                     }
@@ -70,9 +70,9 @@ public class Teleport : BaseItem
     }
     public override void Render(AdvRadialMenu radialMenu)
     {
-        if (radialMenu.RadialMenuItem(this.Title))
+        if (radialMenu.RadialMenuItem(Title))
         {
-            this.Execute();
+            Execute();
         }
     }
     public bool IsHouse = false;

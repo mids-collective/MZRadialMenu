@@ -34,7 +34,7 @@ public class HotkeyButton
             var str = $"Binding: ";
             if (key != VirtualKey.NO_KEY)
             {
-                str += $"{key.ToString()}";
+                str += $"{key}";
             }
             else
             {

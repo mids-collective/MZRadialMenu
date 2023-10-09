@@ -115,35 +115,29 @@ public unsafe class MZRadialMenu : IDalamudPlugin
             ImGui.BeginChild($"Configuration", size);
             for (int c = 0; c < ConfigWindow!.WheelSet.Count; c++)
             {
-                var Config = ConfigWindow.WheelSet[c];
-                ImGui.PushID(c);
+                var Item = ConfigWindow.WheelSet[c];
+                ImGui.PushID(Item.UUID.ToString());
                 if (ImGui.Button("X"))
                 {
                     ConfigWindow.WheelSet.RemoveAt(c);
                 }
-                else
+                ImGui.SameLine();
+                if (ImGui.Button("Export Wheel"))
                 {
-                    ImGui.SameLine();
-                    if (ImGui.Button("Export Wheel"))
-                    {
-                        var cpy = Config.DeepCopy();
-                        cpy.UUID = string.Empty;
-                        cpy.key.key = VirtualKey.NO_KEY;
-                        var json = JsonConvert.SerializeObject(cpy);
-                        var exp = $"MZRW_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
-                        ImGui.SetClipboardText(exp);
-                    }
-                    ImGui.SameLine();
-                    ImGui.PushID(Config.UUID.ToString());
-                    if (ImGui.TreeNode(Config.UUID.ToString(), Config.Title))
-                    {
-                        Config.key.Render();
-                        Config.RawRender();
-                        ImGui.TreePop();
-                    }
-                    ImGui.PopID();
+                    var cpy = Item.DeepCopy();
+                    cpy.UUID = string.Empty;
+                    cpy.key.key = VirtualKey.NO_KEY;
+                    var json = JsonConvert.SerializeObject(cpy);
+                    var exp = $"MZRW_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
+                    ImGui.SetClipboardText(exp);
                 }
-
+                ImGui.SameLine();
+                if (ImGui.TreeNode(Item.UUID.ToString(), Item.Title))
+                {
+                    Item.key.Render();
+                    Item.RawRender();
+                    ImGui.TreePop();
+                }
                 ImGui.PopID();
             }
             ImGui.EndChild();
@@ -178,11 +172,11 @@ public unsafe class MZRadialMenu : IDalamudPlugin
             if (ImGui.Button("Save"))
             {
                 ActiveConfig = ConfigWindow.DeepCopy();
+                DalamudApi.PluginInterface.SavePluginConfig(ActiveConfig);
             }
             ImGui.SameLine();
             if (ImGui.Button("Revert"))
             {
-                DalamudApi.PluginInterface.SavePluginConfig(ActiveConfig);
                 ConfigWindow = ActiveConfig.DeepCopy();
             }
             ImGui.SameLine();

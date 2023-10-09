@@ -10,18 +10,18 @@ public class Wheel : Menu
 {
     public override void Render(AdvRadialMenu radialMenu)
     {
-        foreach (var itm in this.Sublist)
+        foreach (var itm in Sublist)
         {
             itm.Render(radialMenu);
         }
     }
     public void Render(AdvRadialMenu radialMenu, bool open)
     {
-        if (this.IsOpen)
+        if (IsOpen)
         {
             if (radialMenu.BeginRadialPopup("##Wheel", open))
             {
-                this.Render(radialMenu);
+                Render(radialMenu);
                 radialMenu.EndRadialMenu();
             }
         }
@@ -29,12 +29,12 @@ public class Wheel : Menu
     public override bool RenderConfig()
     {
         bool show_buttons = true;
-        ImGui.PushID(this.UUID);
-        if (ImGui.TreeNode(this.UUID, this.Title))
+        ImGui.PushID(UUID);
+        if (ImGui.TreeNode(UUID, Title))
         {
             show_buttons = false;
-            this.key.Render();
-            base.RawRender();
+            key.Render();
+            show_buttons &= base.RawRender();
             ImGui.TreePop();
         }
         ImGui.PopID();

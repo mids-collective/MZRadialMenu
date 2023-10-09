@@ -17,44 +17,41 @@ public class Menu : BaseItem
     public bool RawRender()
     {
         bool show_buttons = true;
-        ImGui.InputText("Title", ref this.Title, 0xF);
-        for (int i = 0; i < this.Sublist.Count; i++)
+        ImGui.InputText("Title", ref Title, 0xF);
+        for (int i = 0; i < Sublist.Count; i++)
         {
-            ImGui.PushID(this.Sublist[i].UUID);
+            var Item = Sublist[i];
+            ImGui.PushID(Item.UUID);
             if (ImGui.Button("X"))
             {
-                this.Sublist.RemoveAt(i);
+                Sublist.RemoveAt(i);
             }
-            else
+
+            ImGui.SameLine();
+            if (ImGui.ArrowButton("##Up", ImGuiDir.Up))
             {
-                ImGui.SameLine();
-                if (ImGui.ArrowButton("##Up", ImGuiDir.Up))
-                {
-                    var temp = this.Sublist[i - 1];
-                    this.Sublist.RemoveAt(i - 1);
-                    this.Sublist.Insert(i, temp);
-                    continue;
-                }
-                ImGui.SameLine();
-                if (ImGui.ArrowButton("##Down", ImGuiDir.Down))
-                {
-                    var temp = this.Sublist[i + 1];
-                    this.Sublist.RemoveAt(i + 1);
-                    this.Sublist.Insert(i, temp);
-                    continue;
-                }
-                ImGui.SameLine();
-                if (ImGui.Button("Export Item"))
-                {
-                    var cpy =this.Sublist[i].DeepCopy();
-                    cpy.UUID = string.Empty;
-                    var json = JsonConvert.SerializeObject(cpy);
-                    var exp = $"MZRM_({Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Sublist[i].GetType().AssemblyQualifiedName!))})_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
-                    ImGui.SetClipboardText(exp);
-                }
-                ImGui.SameLine();
-                show_buttons &= this.Sublist[i].RenderConfig();
+                var temp = Sublist[i - 1];
+                Sublist.RemoveAt(i - 1);
+                Sublist.Insert(i, temp);
             }
+            ImGui.SameLine();
+            if (ImGui.ArrowButton("##Down", ImGuiDir.Down))
+            {
+                var temp = Sublist[i + 1];
+                Sublist.RemoveAt(i + 1);
+                Sublist.Insert(i, temp);
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Export Item"))
+            {
+                var cpy = Item.DeepCopy();
+                cpy.UUID = string.Empty;
+                var json = JsonConvert.SerializeObject(cpy);
+                var exp = $"MZRM_({Convert.ToBase64String(Encoding.UTF8.GetBytes(Sublist[i].GetType().AssemblyQualifiedName!))})_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
+                ImGui.SetClipboardText(exp);
+            }
+            ImGui.SameLine();
+            show_buttons &= Item.RenderConfig();
             ImGui.PopID();
         }
         if (show_buttons)
@@ -64,10 +61,10 @@ public class Menu : BaseItem
             {
                 if (!t.Value.Hide)
                 {
-                    ImGui.PushID(this.UUID);
+                    ImGui.PushID(UUID);
                     if (ImGui.Button($"+ {t.Value.Name}"))
                     {
-                        this.Sublist.Add((Activator.CreateInstance(t.Key) as BaseItem)!);
+                        Sublist.Add((Activator.CreateInstance(t.Key) as BaseItem)!);
                     }
                     if (++c != Types.Count - 1)
                     {
@@ -87,7 +84,7 @@ public class Menu : BaseItem
                 var typ = Type.GetType(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[1].Captures[0].Value)));
                 var obj = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[2].Captures[0].Value)), typ!);
                 (obj as BaseItem)!.UUID = System.Guid.NewGuid().ToString();
-                this.Sublist.Add((obj as BaseItem)!);
+                Sublist.Add((obj as BaseItem)!);
             }
         }
         return show_buttons;
@@ -95,11 +92,11 @@ public class Menu : BaseItem
     public override bool RenderConfig()
     {
         bool show_buttons = true;
-        ImGui.PushID(this.UUID);
-        if (ImGui.TreeNode(this.UUID, this.Title))
+        ImGui.PushID(UUID);
+        if (ImGui.TreeNode(UUID, Title))
         {
             show_buttons = false;
-            this.RawRender();
+            RawRender();
             ImGui.TreePop();
         }
         ImGui.PopID();
@@ -107,9 +104,9 @@ public class Menu : BaseItem
     }
     public override void Render(AdvRadialMenu radialMenu)
     {
-        if (radialMenu.BeginRadialMenu(this.Title))
+        if (radialMenu.BeginRadialMenu(Title))
         {
-            foreach (var sh in this.Sublist)
+            foreach (var sh in Sublist)
             {
                 sh.Render(radialMenu);
             }

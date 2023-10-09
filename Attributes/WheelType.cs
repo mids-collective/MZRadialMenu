@@ -12,8 +12,8 @@ public class WheelTypeAttribute : Attribute
     public string Name;
     public WheelTypeAttribute(string name = "", bool Hidden = false)
     {
-        this.Name = name;
-        this.Hide = Hidden;
+        Name = name;
+        Hide = Hidden;
     }
 }
 public static class Registry

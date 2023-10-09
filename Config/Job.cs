@@ -12,8 +12,8 @@ public class Job : BaseItem
 {
     public override bool RenderConfig()
     {
-        ImGui.PushID(this.UUID);
-        if (ImGui.BeginCombo("Job / Class", this.Title))
+        ImGui.PushID(UUID);
+        if (ImGui.BeginCombo("Job / Class", Title))
         {
             foreach (var cjb in cljb.Where(x => x.Name != "adventurer").OrderBy(x => x.Role).ThenBy(x => x.ClassJobParent.Row).ThenBy(x => x.RowId))
             {
@@ -33,10 +33,10 @@ public class Job : BaseItem
     }
     public override void Render(AdvRadialMenu radialMenu)
     {
-        if (radialMenu.RadialMenuItem(this.Title))
+        if (radialMenu.RadialMenuItem(Title))
         {
-            DalamudApi.PluginLog.Debug($"{cljb.Where(x => x.NameEnglish.ToString().Equals(this.Title)).First().NameEnglish.ToString()}");
-            MZRadialMenu.Instance!.ExecuteCommand($"/gs change \"{cljb.Where(x => x.NameEnglish.ToString().Equals(this.Title)).First().NameEnglish.ToString()}\"");
+            DalamudApi.PluginLog.Debug($"{cljb.Where(x => x.NameEnglish.ToString().Equals(Title)).First().NameEnglish.ToString()}");
+            MZRadialMenu.Instance!.ExecuteCommand($"/gs change \"{cljb.Where(x => x.NameEnglish.ToString().Equals(Title)).First().NameEnglish.ToString()}\"");
         }
     }
     [JsonIgnore]

@@ -9,10 +9,10 @@ public class Shortcut : BaseItem
 {
     public override bool RenderConfig()
     {
-        ImGui.PushID(this.UUID);
-        if (ImGui.TreeNode(this.UUID, this.Title))
+        ImGui.PushID(UUID);
+        if (ImGui.TreeNode(UUID, Title))
         {
-            ImGui.InputText("Title", ref this.Title, 0xF);
+            ImGui.InputText("Title", ref Title, 0xF);
             ImGui.InputText("Command", ref Command, 0x40);
             ImGui.TreePop();
         }
@@ -21,13 +21,13 @@ public class Shortcut : BaseItem
     }
     public void Execute()
     {
-        MZRadialMenu.Instance!.ExecuteCommand(this.Command);
+        MZRadialMenu.Instance!.ExecuteCommand(Command);
     }
     public override void Render(AdvRadialMenu radialMenu)
     {
-        if (radialMenu.RadialMenuItem(this.Title))
+        if (radialMenu.RadialMenuItem(Title))
         {
-            this.Execute();
+            Execute();
         }
     }
     public string Command = string.Empty;

@@ -18,14 +18,14 @@ public class MacroShortcut : BaseItem
 {
     public override bool RenderConfig()
     {
-        ImGui.PushID(this.UUID);
-        if (ImGui.TreeNode(this.UUID, this.Title))
+        ImGui.PushID(UUID);
+        if (ImGui.TreeNode(UUID, Title))
         {
-            ImGui.InputText($"Title###{this.UUID}#Title", ref this.Title, 0xF);
+            ImGui.InputText($"Title###{UUID}#Title", ref Title, 0xF);
             ImGui.Text($"Macro Commands");
-            var combinds = String.Join('\n', this.Commands);
-            ImGui.InputTextMultiline($"###{this.UUID}#Commands", ref combinds, 0x41 * 30, new Vector2(ImGui.CalcItemWidth(), 200));
-            this.Commands = combinds.Split('\n').Where(x => !String.IsNullOrEmpty(x)).Take(30).ToArray();
+            var combinds = String.Join('\n', Commands);
+            ImGui.InputTextMultiline($"###{UUID}#Commands", ref combinds, 0x41 * 30, new Vector2(ImGui.CalcItemWidth(), 200));
+            Commands = combinds.Split('\n').Where(x => !String.IsNullOrEmpty(x)).Take(30).ToArray();
             ImGui.TreePop();
         }
         ImGui.PopID();
@@ -34,7 +34,7 @@ public class MacroShortcut : BaseItem
     public unsafe void Execute()
     {
         var macroPtr = Marshal.AllocHGlobal(ExtendedMacro.size);
-        using var ExMacro = new ExtendedMacro(macroPtr, string.Empty, this.Commands);
+        using var ExMacro = new ExtendedMacro(macroPtr, string.Empty, Commands);
         Marshal.StructureToPtr(ExMacro, macroPtr, false);
         var commandCount = (byte)Math.Max(Macro.numLines, Commands.Length);
         MZRadialMenu.NumCopiedMacroLines = commandCount;
@@ -45,9 +45,9 @@ public class MacroShortcut : BaseItem
     }
     public override void Render(AdvRadialMenu radialMenu)
     {
-        if (radialMenu.RadialMenuItem(this.Title))
+        if (radialMenu.RadialMenuItem(Title))
         {
-            this.Execute();
+            Execute();
         }
     }
     public string[] Commands = new string[0];
