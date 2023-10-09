@@ -242,7 +242,6 @@ public unsafe class MZRadialMenu : IDalamudPlugin
     [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 89 7C 24 38")]
     private static delegate* unmanaged<nint, uint, uint, uint, short, void> useItem;
     public static nint itemContextMenuAgent;
-    private static RaptureAtkUnitManager* raptureAtkUnitManager;
     [Signature("E8 ?? ?? ?? ?? 44 8B 4B 2C")]
     private static delegate* unmanaged<uint, uint, uint> getActionID;
 
