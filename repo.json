@@ -20,9 +20,9 @@
     "LoadSync": false,
     "AssemblyVersion": "0.0.3.1",
     "TestingAssemblyVersion": "0.0.3.1",
-    "DownloadLinkInstall": null,
-    "DownloadLinkTesting": null,
-    "DownloadLinkUpdate": null,
+    "DownloadLinkInstall": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.3.1/MZRadialMenu.zip",
+    "DownloadLinkTesting": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.3.1/MZRadialMenu.zip",
+    "DownloadLinkUpdate": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.0.3.1/MZRadialMenu.zip",
     "IconUrl": ""
   }
 ]
