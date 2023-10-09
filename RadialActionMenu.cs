@@ -19,10 +19,13 @@ using FFXIVClientStructs.FFXIV.Client.UI.Shell;
 using MZRadialMenu.Structures;
 using MZRadialMenu.Attributes;
 using MZRadialMenu.Config;
+using MZRadialMenu.Extensions;
 
 using Newtonsoft.Json;
 using ImComponents;
 using ImGuiNET;
+
+
 
 namespace MZRadialMenu;
 
@@ -30,7 +33,8 @@ public unsafe class MZRadialMenu : IDalamudPlugin
 {
     public static MZRadialMenu? Instance;
     public string Name => "MZRadialMenu";
-    private Wheels Configuration;
+    private Wheels ActiveConfig;
+    private Wheels ConfigWindow;
     private PluginCommandManager<MZRadialMenu> commandManager;
     private bool ConfigOpen = false;
     private uint retryItem = 0;
@@ -82,13 +86,13 @@ public unsafe class MZRadialMenu : IDalamudPlugin
     private AdvRadialMenu MyRadialMenu;
     private void RenderWheel()
     {
-        for (int i = 0; i < Configuration!.WheelSet.Count; i++)
+        for (int i = 0; i < ActiveConfig!.WheelSet.Count; i++)
         {
-            var Config = Configuration.WheelSet[i];
+            var Config = ActiveConfig.WheelSet[i];
             if (Config.key.key != 0x0)
             {
                 var open = Dalamud.Keys[Config.key.key];
-                if (open && !Configuration.WheelSet.Any(x => x.IsOpen) && uiModule != null && !IsGameTextInputActive)
+                if (open && !ActiveConfig.WheelSet.Any(x => x.IsOpen) && uiModule != null && !IsGameTextInputActive)
                 {
                     Config.IsOpen = true;
                     ImGui.OpenPopup("##Wheel", ImGuiPopupFlags.NoOpenOverExistingPopup);
@@ -106,13 +110,13 @@ public unsafe class MZRadialMenu : IDalamudPlugin
         if (ConfigOpen)
         {
             ImGui.Begin("MZ Radial Menu Config", ref ConfigOpen);
-            for (int c = 0; c < Configuration!.WheelSet.Count; c++)
+            for (int c = 0; c < ConfigWindow!.WheelSet.Count; c++)
             {
-                var Config = Configuration.WheelSet[c];
+                var Config = ActiveConfig.WheelSet[c];
                 ImGui.PushID(c);
                 if (ImGui.Button("X"))
                 {
-                    Configuration.WheelSet.RemoveAt(c);
+                    ActiveConfig.WheelSet.RemoveAt(c);
                 }
                 else
                 {
@@ -138,7 +142,7 @@ public unsafe class MZRadialMenu : IDalamudPlugin
             }
             if (ImGui.Button("New Wheel"))
             {
-                Configuration.WheelSet.Add(new Wheel());
+                ActiveConfig.WheelSet.Add(new Wheel());
             }
             ImGui.SameLine();
             if (ImGui.Button("Import Wheel"))
@@ -148,19 +152,26 @@ public unsafe class MZRadialMenu : IDalamudPlugin
                 {
                     clip = clip[6..^1];
                     var obj = JsonConvert.DeserializeObject<Wheel>(Encoding.UTF8.GetString(Convert.FromBase64String(clip)))!;
-                    Configuration.WheelSet.Add(obj);
+                    ActiveConfig.WheelSet.Add(obj);
                 }
             }
             ImGui.SameLine();
             if (ImGui.Button("Save"))
             {
-                Dalamud.PluginInterface.SavePluginConfig(Configuration);
+                Dalamud.PluginInterface.SavePluginConfig(ActiveConfig);
+                ActiveConfig = ConfigWindow.DeepCopy();
             }
             ImGui.SameLine();
-            if (ImGui.Button("Save and Close"))
+            if (ImGui.Button("Revert"))
             {
-                Dalamud.PluginInterface.SavePluginConfig(Configuration);
+                Dalamud.PluginInterface.SavePluginConfig(ActiveConfig);
+                ConfigWindow = ActiveConfig.DeepCopy();
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Close"))
+            {
                 ConfigOpen = false;
+                ConfigWindow = ActiveConfig.DeepCopy();
             }
             ImGui.End();
         }
@@ -177,7 +188,8 @@ public unsafe class MZRadialMenu : IDalamudPlugin
         MyRadialMenu = new();
         Instance = this;
         commandManager = new PluginCommandManager<MZRadialMenu>(this);
-        Configuration = (Wheels?)Dalamud.PluginInterface.GetPluginConfig() ?? new();
+        ActiveConfig = (Wheels?)Dalamud.PluginInterface.GetPluginConfig() ?? new();
+        ConfigWindow = ActiveConfig.DeepCopy();
         Dalamud.PluginInterface.UiBuilder.Draw += Draw;
         Dalamud.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfig;
         if (Dalamud.ClientState.IsLoggedIn)
