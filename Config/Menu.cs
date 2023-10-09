@@ -5,6 +5,8 @@ using ImComponents;
 using MZRadialMenu.Attributes;
 using ImGuiNET;
 using Newtonsoft.Json;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace MZRadialMenu.Config;
 
@@ -24,7 +26,30 @@ public class Menu : BaseItem
             else
             {
                 ImGui.SameLine();
-                this.Sublist[i].ReTree();
+                if (ImGui.ArrowButton("##Up", ImGuiDir.Up))
+                {
+                    var temp = this.Sublist[i - 1];
+                    this.Sublist.RemoveAt(i - 1);
+                    this.Sublist.Insert(i, temp);
+                    continue;
+                }
+                ImGui.SameLine();
+                if (ImGui.ArrowButton("##Down", ImGuiDir.Down))
+                {
+                    var temp = this.Sublist[i + 1];
+                    this.Sublist.RemoveAt(i + 1);
+                    this.Sublist.Insert(i, temp);
+                    continue;
+                }
+                ImGui.SameLine();
+                if (ImGui.Button("Export Tree"))
+                {
+                    var json = JsonConvert.SerializeObject(this.Sublist[i]);
+                    var exp = $"MZRM_({Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Sublist[i].GetType().AssemblyQualifiedName!))})_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
+                    ImGui.SetClipboardText(exp);
+                }
+                ImGui.SameLine();
+                this.Sublist[i].RenderConfig();
             }
             ImGui.PopID();
         }
@@ -45,8 +70,20 @@ public class Menu : BaseItem
                 ImGui.PopID();
             }
         }
+        ImGui.SameLine();
+        if (ImGui.Button("Import Tree"))
+        {
+            var clip = ImGui.GetClipboardText();
+            var regex = new Regex(@"MZRM_\((.*)\)_\((.*)\)");
+            var matches = regex.Match(clip);
+            Dalamud.PluginLog.Info(matches.Groups[1].Captures[0].Value);
+            Dalamud.PluginLog.Info(matches.Groups[2].Captures[0].Value);
+            var typ = Type.GetType(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[1].Captures[0].Value)));
+            var obj = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[2].Captures[0].Value)), typ!);
+            this.Sublist.Add((obj as BaseItem)!);
+        }
     }
-    public override void ReTree()
+    public override void RenderConfig()
     {
         ImGui.PushID(this.UUID);
         if (ImGui.TreeNode(this.UUID, this.Title))

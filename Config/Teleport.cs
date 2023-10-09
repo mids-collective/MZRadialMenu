@@ -30,7 +30,7 @@ public class Teleport : BaseItem
         Telepo.Instance()->Teleport(this.TelepoID, this.TelepoSubID);
         return;
     }
-    public override void ReTree()
+    public override void RenderConfig()
     {
         ImGui.PushID(this.UUID);
         if (ImGui.TreeNode(this.UUID, this.Title))

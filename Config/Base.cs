@@ -12,23 +12,14 @@ namespace MZRadialMenu.Config;
 [JsonConverter(typeof(Converter))]
 public abstract class BaseItem
 {
-    public abstract void ReTree();
+    public abstract void RenderConfig();
     public abstract void Render(AdvRadialMenu radialMenu);
+    [JsonIgnore]
     public string UUID = System.Guid.NewGuid().ToString();
     public string Title = string.Empty;
 }
 public class Converter : JsonConverter
 {
-    static IEnumerable<Type> GetTypesWithHelpAttribute(Assembly assembly)
-    {
-        foreach (Type type in assembly.GetTypes())
-        {
-            if (type.GetCustomAttributes(typeof(WheelTypeAttribute), true).Length > 0)
-            {
-                yield return type;
-            }
-        }
-    }
     public Converter()
     {
         Conversions = Registry.GetTypes<WheelTypeAttribute>();

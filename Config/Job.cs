@@ -10,7 +10,7 @@ namespace MZRadialMenu.Config;
 [WheelType("Job", false)]
 public class Job : BaseItem
 {
-    public override void ReTree()
+    public override void RenderConfig()
     {
         ImGui.PushID(this.UUID);
         if (ImGui.BeginCombo("Job / Class", this.Title))

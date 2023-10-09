@@ -26,7 +26,7 @@ public class Wheel : Menu
             }
         }
     }
-    public override void ReTree()
+    public override void RenderConfig()
     {
         ImGui.PushID(this.UUID);
         if (ImGui.TreeNode(this.UUID, this.Title))
