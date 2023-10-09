@@ -39,12 +39,12 @@ jobs:
         with:
           path: |
             ./bin/Debug/*
-            - name: Upload Release
+      - name: Create & Upload Release
         id: upload-release-asset
         uses: softprops/action-gh-release@v1
         with:
           files: MZRadialMenu.zip
-          token: {{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Write out repo.json
         run: |
           $verT = '${{ github.ref_name }}'
