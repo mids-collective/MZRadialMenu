@@ -51,7 +51,6 @@ jobs:
           name: Testing MZRadialMenu ${{ github.ref_name }}
       - name: Write out repo.json
         run: |
-          echo '${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}'
           $verT = '${{ github.ref_name }}'
           $ver = $verT -replace 'testing_'
           $path = './repo.json'
