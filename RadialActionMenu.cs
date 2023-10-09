@@ -112,11 +112,11 @@ public unsafe class MZRadialMenu : IDalamudPlugin
             ImGui.Begin("MZ Radial Menu Config", ref ConfigOpen);
             for (int c = 0; c < ConfigWindow!.WheelSet.Count; c++)
             {
-                var Config = ActiveConfig.WheelSet[c];
+                var Config = ConfigWindow.WheelSet[c];
                 ImGui.PushID(c);
                 if (ImGui.Button("X"))
                 {
-                    ActiveConfig.WheelSet.RemoveAt(c);
+                    ConfigWindow.WheelSet.RemoveAt(c);
                 }
                 else
                 {
@@ -142,7 +142,7 @@ public unsafe class MZRadialMenu : IDalamudPlugin
             }
             if (ImGui.Button("New Wheel"))
             {
-                ActiveConfig.WheelSet.Add(new Wheel());
+                ConfigWindow.WheelSet.Add(new Wheel());
             }
             ImGui.SameLine();
             if (ImGui.Button("Import Wheel"))
@@ -152,13 +152,13 @@ public unsafe class MZRadialMenu : IDalamudPlugin
                 {
                     clip = clip[6..^1];
                     var obj = JsonConvert.DeserializeObject<Wheel>(Encoding.UTF8.GetString(Convert.FromBase64String(clip)))!;
-                    ActiveConfig.WheelSet.Add(obj);
+                    ConfigWindow.WheelSet.Add(obj);
                 }
             }
             ImGui.SameLine();
-            if (ImGui.Button("Save"))
+            if (ImGui.Button("Save and Close"))
             {
-                Dalamud.PluginInterface.SavePluginConfig(ActiveConfig);
+                ConfigOpen = false;
                 ActiveConfig = ConfigWindow.DeepCopy();
             }
             ImGui.SameLine();
