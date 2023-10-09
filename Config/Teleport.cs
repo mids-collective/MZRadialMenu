@@ -14,7 +14,7 @@ public class Teleport : BaseItem
 {
     public unsafe void Execute()
     {
-        if (Dalamud.ClientState.LocalPlayer == null)
+        if (DalamudApi.ClientState.LocalPlayer == null)
         {
             return;
         }
@@ -23,9 +23,9 @@ public class Teleport : BaseItem
         {
             return;
         }
-        if (Dalamud.ClientState.LocalPlayer.HomeWorld.Id != Dalamud.ClientState.LocalPlayer.CurrentWorld.Id && this.IsHouse)
+        if (DalamudApi.ClientState.LocalPlayer.HomeWorld.Id != DalamudApi.ClientState.LocalPlayer.CurrentWorld.Id && this.IsHouse)
         {
-            Dalamud.Chat.PrintError($"Cannot teleport to housing while using visiting other worlds!");
+            DalamudApi.Chat.PrintError($"Cannot teleport to housing while using visiting other worlds!");
         }
         Telepo.Instance()->Teleport(this.TelepoID, this.TelepoSubID);
         return;
@@ -38,18 +38,18 @@ public class Teleport : BaseItem
             ImGui.InputText("Title", ref this.Title, 0xF);
             if (
                 ImGui.BeginCombo(
-                    "Teleport", Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(this.TelepoID)!.PlaceName.Value?.Name.ToString()!)
+                    "Teleport", DalamudApi.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(this.TelepoID)!.PlaceName.Value?.Name.ToString()!)
                 )
             )
             {
-                foreach (var itm in Dalamud.AetheryteList
+                foreach (var itm in DalamudApi.AetheryteList
                     .OrderBy(x => Aetherytes.GetRow(x.AetheryteData.GameData!.RowId)!.Territory.Value!.PlaceNameRegion.Row)
                     .ThenBy(x => Aetherytes.GetRow(x.AetheryteData.GameData!.RowId)!.PlaceName.Row)
                 )
                 {
                     if (
                         ImGui.Selectable(
-                            Dalamud.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(itm.AetheryteData.GameData!.RowId)!.PlaceName.Value?.Name.ToString()!)
+                            DalamudApi.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(itm.AetheryteData.GameData!.RowId)!.PlaceName.Value?.Name.ToString()!)
                         )
                     )
                     {
@@ -79,5 +79,5 @@ public class Teleport : BaseItem
     public uint TelepoID = 0;
     public byte TelepoSubID = 0;
     [JsonIgnore]
-    private static Lumina.Excel.ExcelSheet<Aetheryte> Aetherytes = Dalamud.GameData.GetExcelSheet<Aetheryte>(Dalamud.ClientState.ClientLanguage)!;
+    private static Lumina.Excel.ExcelSheet<Aetheryte> Aetherytes = DalamudApi.GameData.GetExcelSheet<Aetheryte>(DalamudApi.ClientState.ClientLanguage)!;
 }

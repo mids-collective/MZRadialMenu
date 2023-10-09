@@ -35,10 +35,10 @@ public class Job : BaseItem
     {
         if (radialMenu.RadialMenuItem(this.Title))
         {
-            Dalamud.PluginLog.Debug($"{cljb.Where(x => x.NameEnglish.ToString().Equals(this.Title)).First().NameEnglish.ToString()}");
+            DalamudApi.PluginLog.Debug($"{cljb.Where(x => x.NameEnglish.ToString().Equals(this.Title)).First().NameEnglish.ToString()}");
             MZRadialMenu.Instance!.ExecuteCommand($"/gs change \"{cljb.Where(x => x.NameEnglish.ToString().Equals(this.Title)).First().NameEnglish.ToString()}\"");
         }
     }
     [JsonIgnore]
-    private static Lumina.Excel.ExcelSheet<ClassJob> cljb = Dalamud.GameData.GetExcelSheet<ClassJob>()!;
+    private static Lumina.Excel.ExcelSheet<ClassJob> cljb = DalamudApi.GameData.GetExcelSheet<ClassJob>()!;
 }

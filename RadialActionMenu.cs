@@ -8,6 +8,7 @@ using Dalamud;
 using Dalamud.Plugin;
 using Dalamud.Utility.Signatures;
 using Dalamud.Hooking;
+using Dalamud.Game.ClientState.Keys;
 
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
@@ -90,7 +91,7 @@ public unsafe class MZRadialMenu : IDalamudPlugin
             var Config = ActiveConfig.WheelSet[i];
             if (Config.key.key != 0x0)
             {
-                var open = Dalamud.Keys[Config.key.key];
+                var open = DalamudApi.Keys[Config.key.key];
                 if (open && !ActiveConfig.WheelSet.Any(x => x.IsOpen) && uiModule != null && !IsGameTextInputActive)
                 {
                     Config.IsOpen = true;
@@ -125,7 +126,10 @@ public unsafe class MZRadialMenu : IDalamudPlugin
                     ImGui.SameLine();
                     if (ImGui.Button("Export Wheel"))
                     {
-                        var json = JsonConvert.SerializeObject(Config);
+                        var cpy = Config.DeepCopy();
+                        cpy.UUID = string.Empty;
+                        cpy.key.key = VirtualKey.NO_KEY;
+                        var json = JsonConvert.SerializeObject(cpy);
                         var exp = $"MZRW_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
                         ImGui.SetClipboardText(exp);
                     }
@@ -157,6 +161,7 @@ public unsafe class MZRadialMenu : IDalamudPlugin
                     clip = clip[6..^1];
                     var obj = JsonConvert.DeserializeObject<Wheel>(Encoding.UTF8.GetString(Convert.FromBase64String(clip)))!;
                     obj.UUID = Guid.NewGuid().ToString();
+                    obj.key.key = VirtualKey.NO_KEY;
                     ConfigWindow.WheelSet.Add(obj);
                 }
             }
@@ -177,7 +182,7 @@ public unsafe class MZRadialMenu : IDalamudPlugin
             ImGui.SameLine();
             if (ImGui.Button("Revert"))
             {
-                Dalamud.PluginInterface.SavePluginConfig(ActiveConfig);
+                DalamudApi.PluginInterface.SavePluginConfig(ActiveConfig);
                 ConfigWindow = ActiveConfig.DeepCopy();
             }
             ImGui.SameLine();
@@ -197,21 +202,21 @@ public unsafe class MZRadialMenu : IDalamudPlugin
 
     public MZRadialMenu(DalamudPluginInterface dpi)
     {
-        Dalamud.Initialize(dpi);
+        DalamudApi.Initialize(dpi);
         MyRadialMenu = new();
         Instance = this;
         commandManager = new PluginCommandManager<MZRadialMenu>(this);
-        ActiveConfig = (Wheels?)Dalamud.PluginInterface.GetPluginConfig() ?? new();
+        ActiveConfig = (Wheels?)DalamudApi.PluginInterface.GetPluginConfig() ?? new();
         ConfigWindow = ActiveConfig.DeepCopy();
-        Dalamud.PluginInterface.UiBuilder.Draw += Draw;
-        Dalamud.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfig;
-        if (Dalamud.ClientState.IsLoggedIn)
+        DalamudApi.PluginInterface.UiBuilder.Draw += Draw;
+        DalamudApi.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfig;
+        if (DalamudApi.ClientState.IsLoggedIn)
         {
             InitCommands();
             InitUsables();
         }
-        Dalamud.ClientState.Login += InitCommands;
-        Dalamud.ClientState.Login += InitUsables;
+        DalamudApi.ClientState.Login += InitCommands;
+        DalamudApi.ClientState.Login += InitUsables;
     }
 
     private void ToggleConfig()
@@ -261,28 +266,28 @@ public unsafe class MZRadialMenu : IDalamudPlugin
 
     private void InitUsables()
     {
-        usables = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>()!.Where(i => i.ItemAction.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
-            .Concat(Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
+        usables = DalamudApi.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>()!.Where(i => i.ItemAction.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
+            .Concat(DalamudApi.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
             .ToDictionary(kv => kv.Key, kv => kv.Value);
-        usables[aetherCompassID] = Dalamud.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.GetRow(aetherCompassID)?.Name.ToString().ToLower()!;
+        usables[aetherCompassID] = DalamudApi.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.GetRow(aetherCompassID)?.Name.ToString().ToLower()!;
     }
 
     private void InitCommands()
     {
-        Dalamud.GameInteropProvider.InitializeFromAttributes(this);
+        DalamudApi.GameInteropProvider.InitializeFromAttributes(this);
 
         uiModule = Framework.Instance()->GetUiModule();
         agentModule = uiModule->GetAgentModule();
         raptureShellModule = uiModule->GetRaptureShellModule();
         raptureMacroModule = uiModule->GetRaptureMacroModule();
-        numCopiedMacroLinesPtr = Dalamud.SigScanner.ScanText("49 8D 5E 70 BF ?? 00 00 00") + 0x5;
-        numExecutedMacroLinesPtr = Dalamud.SigScanner.ScanText("41 83 F8 ?? 0F 8D ?? ?? ?? ?? 49 6B C8 68") + 0x3;
+        numCopiedMacroLinesPtr = DalamudApi.SigScanner.ScanText("49 8D 5E 70 BF ?? 00 00 00") + 0x5;
+        numExecutedMacroLinesPtr = DalamudApi.SigScanner.ScanText("41 83 F8 ?? 0F 8D ?? ?? ?? ?? 49 6B C8 68") + 0x3;
 
         itemContextMenuAgent = GetAgentByInternalID(AgentId.InventoryContext);
 
         ExecuteMacroHook!.Enable();
 
-        Dalamud.PluginLog.Info("Commands Initialized");
+        DalamudApi.PluginLog.Info("Commands Initialized");
     }
 
     public void ExecuteCommand(string command)
@@ -319,7 +324,7 @@ public unsafe class MZRadialMenu : IDalamudPlugin
         }
         catch
         {
-            Dalamud.PluginLog.Error("Error with injecting command");
+            DalamudApi.PluginLog.Error("Error with injecting command");
         }
         Marshal.FreeHGlobal(stringPtr);
     }
@@ -328,10 +333,10 @@ public unsafe class MZRadialMenu : IDalamudPlugin
     {
         NumCopiedMacroLines = 15;
         NumExecutedMacroLines = 15;
-        Dalamud.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfig;
-        Dalamud.PluginInterface.UiBuilder.Draw -= Draw;
-        Dalamud.ClientState.Login -= InitCommands;
-        Dalamud.ClientState.Login -= InitUsables;
+        DalamudApi.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfig;
+        DalamudApi.PluginInterface.UiBuilder.Draw -= Draw;
+        DalamudApi.ClientState.Login -= InitCommands;
+        DalamudApi.ClientState.Login -= InitUsables;
         ExecuteMacroHook!.Dispose();
         commandManager.Dispose();
     }

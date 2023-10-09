@@ -25,12 +25,12 @@ public class PluginCommandManager<T> : IDisposable where T : IDalamudPlugin
     private void AddCommandHandlers()
     {
         foreach (var (command, commandInfo) in _pluginCommands)
-            Dalamud.Commands.AddHandler(command, commandInfo);
+            DalamudApi.Commands.AddHandler(command, commandInfo);
     }
     private void RemoveCommandHandlers()
     {
         foreach (var (command, _) in _pluginCommands)
-            Dalamud.Commands.RemoveHandler(command);
+            DalamudApi.Commands.RemoveHandler(command);
     }
     private IEnumerable<(string, CommandInfo)> GetCommandInfoTuple(MethodInfo method)
     {

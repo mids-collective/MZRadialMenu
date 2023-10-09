@@ -17,9 +17,9 @@ public class HotkeyButton
     public System.Guid UUID = System.Guid.NewGuid();
     private void WaitForKey()
     {
-        foreach (var ky in Dalamud.Keys.GetValidVirtualKeys())
+        foreach (var ky in DalamudApi.Keys.GetValidVirtualKeys())
         {
-            if (Dalamud.Keys[ky])
+            if (DalamudApi.Keys[ky])
             {
                 waitingForKey = false;
                 key = ky;

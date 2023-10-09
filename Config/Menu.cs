@@ -7,6 +7,7 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using MZRadialMenu.Extensions;
 
 namespace MZRadialMenu.Config;
 
@@ -45,7 +46,9 @@ public class Menu : BaseItem
                 ImGui.SameLine();
                 if (ImGui.Button("Export Item"))
                 {
-                    var json = JsonConvert.SerializeObject(this.Sublist[i]);
+                    var cpy =this.Sublist[i].DeepCopy();
+                    cpy.UUID = string.Empty;
+                    var json = JsonConvert.SerializeObject(cpy);
                     var exp = $"MZRM_({Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Sublist[i].GetType().AssemblyQualifiedName!))})_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
                     ImGui.SetClipboardText(exp);
                 }
@@ -79,8 +82,8 @@ public class Menu : BaseItem
                 var clip = ImGui.GetClipboardText();
                 var regex = new Regex(@"MZRM_\((.*)\)_\((.*)\)");
                 var matches = regex.Match(clip);
-                Dalamud.PluginLog.Info(matches.Groups[1].Captures[0].Value);
-                Dalamud.PluginLog.Info(matches.Groups[2].Captures[0].Value);
+                DalamudApi.PluginLog.Info(matches.Groups[1].Captures[0].Value);
+                DalamudApi.PluginLog.Info(matches.Groups[2].Captures[0].Value);
                 var typ = Type.GetType(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[1].Captures[0].Value)));
                 var obj = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[2].Captures[0].Value)), typ!);
                 (obj as BaseItem)!.UUID = System.Guid.NewGuid().ToString();

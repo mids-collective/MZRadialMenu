@@ -4,10 +4,10 @@ using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 
 namespace MZRadialMenu;
-public class Dalamud
+public class DalamudApi
 {
     public static void Initialize(DalamudPluginInterface pluginInterface)
-        => pluginInterface.Create<Dalamud>();
+        => pluginInterface.Create<DalamudApi>();
 
     [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] public static IDataManager GameData { get; private set; } = null!;
