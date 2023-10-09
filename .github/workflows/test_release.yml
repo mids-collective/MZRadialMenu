@@ -50,15 +50,14 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Testing MZRadialMenu ${{ github.ref_name }}
       - name: Write out repo.json
-        env:
-          url: ${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}
         run: |
+          echo '${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}'
           $verT = '${{ github.ref_name }}'
           $ver = $verT -replace 'testing_'
           $path = './repo.json'
           $json = Get-Content -Raw $path | ConvertFrom-Json
           $json[0].TestingAssemblyVersion = $ver          
-          $json[0].DownloadLinkTesting = $url
+          $json[0].DownloadLinkTesting = '${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}'
           $content = $json | ConvertTo-Json -AsArray
           set-content -Path $path -Value $content
 
