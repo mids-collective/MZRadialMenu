@@ -6,9 +6,16 @@ on:
     tags-ignore: '*'
   workflow_dispatch:
 
+env:
+  PROJECT_NAME: MZRadialMenu
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,15 +26,15 @@ jobs:
           dotnet-version: '7.x.x'
       - name: Download Dalamud
         run: |
-          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/stg/latest.zip -OutFile latest.zip
-          Expand-Archive -Force latest.zip "$env:AppData\XIVLauncher\addon\Hooks\dev\"
+          wget https://goatcorp.github.io/dalamud-distrib/stg/latest.zip
+          7z e latest.zip -o $HOME/.xlcore/dalamud/Hooks/dev
       - name: Build
         run: |
           dotnet build --configuration Release --nologo
       - name: Archive
-        run: Compress-Archive -Path bin/Release/* -DestinationPath MZRadialMenu.zip
+        run: 7z a $PROJECT_NAME.zip bin/release/*
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3
         with:
           path: |
-            bin/Release/*
+            MZRadialMenu.zip
