@@ -37,7 +37,7 @@ jobs:
       - name: Json Update
         run: |
           export ver="${{ github.ref_name }}"
-          export path='./bin/Release/$PROJECT_NAME.json'
+          export path="./bin/Release/$PROJECT_NAME.json"
           file=$(jq '.AssemblyVersion=env.ver' $path)
           echo $file>$path
       - name: Archive
