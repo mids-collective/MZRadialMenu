@@ -6,6 +6,9 @@ on:
     tags-ignore: '*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 env:
   PROJECT_NAME: MZRadialMenu
 
@@ -27,7 +30,7 @@ jobs:
       - name: Download Dalamud
         run: |
           wget https://goatcorp.github.io/dalamud-distrib/stg/latest.zip
-          7z e latest.zip -o $HOME/.xlcore/dalamud/Hooks/dev
+          7z x latest.zip -o$HOME/.xlcore/dalamud/Hooks/dev
       - name: Build
         run: |
           dotnet build --configuration Release --nologo
