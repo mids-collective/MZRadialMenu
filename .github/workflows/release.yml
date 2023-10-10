@@ -58,8 +58,18 @@ jobs:
         run: |
           export ver="${{ github.ref_name }}"
           export repo="./repo.json"
-          export jso="$PROJECT_NAME.json"
-          file=$(jq -s '.[0][0].AssemblyVersion=env.ver|.[0][0].TestingAssemblyVersion=env.ver|.[0][0].DownloadLinkInstall="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"|.[0][0].DownloadLinkTesting="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"|.[0][0].DownloadLinkUpdate="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"|.[0][0].Tags=.[1].Tags|.[0][0].RepoUrl=.[1].RepoUrl|.[0][0].Punchline=.[1].Punchline|.[0][0].Description=.[1].Description|.[0]' $repo $jso)
+          export base="$PROJECT_NAME.json"
+          file=$(jq '
+            .[0].AssemblyVersion=env.ver |
+            .[0].TestingAssemblyVersion=env.ver |
+            .[0].DownloadLinkInstall="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}" |
+            .[0].DownloadLinkTesting="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}" |
+            .[0].DownloadLinkUpdate="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}" |
+            .[0].Tags=$base[0].Tags |
+            .[0].RepoUrl=$base[0].RepoUrl |
+            .[0].Punchline=$base[0].Punchline |
+            .[0].Description=$base[0].Description
+          ' $repo --slurpfile base $base)
           echo $file | jq '.'>$repo
       - name: Commit repo.json
         run: |
