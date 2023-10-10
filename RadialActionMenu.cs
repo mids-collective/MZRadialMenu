@@ -320,13 +320,13 @@ public unsafe class MZRadialMenu : IDalamudPlugin
     {
         NumCopiedMacroLines = 15;
         NumExecutedMacroLines = 15;
-        commandManager.Dispose();
         DalamudApi.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfig;
         DalamudApi.PluginInterface.UiBuilder.Draw -= DrawWheel;
         DalamudApi.PluginInterface.UiBuilder.Draw -= DrawConfig;
         DalamudApi.ClientState.Login -= InitCommands;
         DalamudApi.ClientState.Login -= InitUsables;
-        ExecuteMacroHook!.Dispose();
+        commandManager?.Dispose();
+        ExecuteMacroHook?.Dispose();
     }
 
     public static void ExecuteMacroDetour(RaptureShellModule* raptureShellModule, nint macro)
