@@ -33,41 +33,34 @@ jobs:
       - name: Build
         run: |
           export ver='${{ github.ref_name }}'
-          dotnet build --configuration Release --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver'
+          dotnet build -c Release --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver'
       - name: Json Update
         run: |
-          $ver = '${{ github.ref_name }}'
-          $path = './bin/Release/MZRadialMenu.json'
-          $json = Get-Content -Raw $path | ConvertFrom-Json
-          $json.AssemblyVersion = $ver
-          $content = $json | ConvertTo-Json
-          set-content -Path $path -Value $content
+          export ver='${{ github.ref_name }}'
+          export path="bin/Release/$PROJECT_NAME.json"
+          file=$(jq '.AssemblyVersion=env.ver' $path)
+          echo $file>$path
       - name: Archive
-        run: Compress-Archive -Path bin/Release/* -DestinationPath MZRadialMenu.zip
+        run: 7z a $PROJECT_NAME.zip ./bin/Release/*.*
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3
         with:
           path: |
-            bin/Release/*
+            ${{ env.PROJECT_NAME }}.zip
       - name: Create & Upload Release
         id: upload-release
         uses: softprops/action-gh-release@v1
         with:
-          files: MZRadialMenu.zip
+          files: ${{ env.PROJECT_NAME }}.zip
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: MZRadialMenu ${{ github.ref_name }}
+          name: ${{ env.PROJECT_NAME }} ${{ github.ref_name }}
       - name: Write out repo.json
         run: |
-          $ver = '${{ github.ref_name }}'
-          $path = './repo.json'
-          $json = Get-Content -Raw $path | ConvertFrom-Json
-          $json[0].AssemblyVersion = $ver
-          $json[0].TestingAssemblyVersion = $ver
-          $json[0].DownloadLinkInstall = '${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}'
-          $json[0].DownloadLinkTesting = '${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}'
-          $json[0].DownloadLinkUpdate = '${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}'
-          $content = $json | ConvertTo-Json -AsArray
-          set-content -Path $path -Value $content
+          export ver='${{ github.ref_name }}'
+          export repo='./repo.json'
+          export jso=$PROJECT_NAME.json
+          file=$(jq -s '.[0][0].AssemblyVersion=env.ver|.[0][0].TestingAssemblyVersion=env.ver|.[0][0].DownloadLinkInstall="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"|.[0][0].DownloadLinkTesting="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"|.[0][0].DownloadLinkUpdate="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"|.[0][0].Tags=.[1].Tags|.[0][0].RepoUrl=.[1].RepoUrl|.[0][0].Punchline=.[1].Punchline|.[0][0].Description=.[1].Description|.[0]' $repo $jso)
+          echo $file > $repo
       - name: Commit repo.json
         run: |
           git config --global user.name "Actions User"
