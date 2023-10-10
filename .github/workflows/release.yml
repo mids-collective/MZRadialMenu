@@ -33,11 +33,11 @@ jobs:
       - name: Build
         run: |
           export ver='${{ github.ref_name }}'
-          dotnet build -c Release --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver'
+          dotnet build -c Release --nologo -p:Version=$ver -p:FileVersion=$ver -p:AssemblyVersion=$ver
       - name: Json Update
         run: |
-          export ver='${{ github.ref_name }}'
-          export path="bin/Release/$PROJECT_NAME.json"
+          export ver="${{ github.ref_name }}"
+          export path='./bin/Release/$PROJECT_NAME.json'
           file=$(jq '.AssemblyVersion=env.ver' $path)
           echo $file>$path
       - name: Archive
@@ -56,9 +56,9 @@ jobs:
           name: ${{ env.PROJECT_NAME }} ${{ github.ref_name }}
       - name: Write out repo.json
         run: |
-          export ver='${{ github.ref_name }}'
-          export repo='./repo.json'
-          export jso=$PROJECT_NAME.json
+          export ver="${{ github.ref_name }}"
+          export repo="./repo.json"
+          export jso="$PROJECT_NAME.json"
           file=$(jq -s '.[0][0].AssemblyVersion=env.ver|.[0][0].TestingAssemblyVersion=env.ver|.[0][0].DownloadLinkInstall="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"|.[0][0].DownloadLinkTesting="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"|.[0][0].DownloadLinkUpdate="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"|.[0][0].Tags=.[1].Tags|.[0][0].RepoUrl=.[1].RepoUrl|.[0][0].Punchline=.[1].Punchline|.[0][0].Description=.[1].Description|.[0]' $repo $jso)
           echo $file > $repo
       - name: Commit repo.json

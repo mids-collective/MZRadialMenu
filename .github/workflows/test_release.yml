@@ -37,7 +37,7 @@ jobs:
       - name: Json Update
         run: |
           export ver='${{ github.ref_name }}'
-          export path="bin/Debug/$PROJECT_NAME.json"
+          export path='./bin/Debug/$PROJECT_NAME.json'
           file=$(jq '.AssemblyVersion=env.ver' $path)
           echo $file>$path
       - name: Archive
@@ -57,7 +57,7 @@ jobs:
       - name: Write out repo.json
         run: |
           export ver='${{ github.ref_name }}'
-          export repo='./repo.json'
+          export repo="./repo.json"
           export jso='$PROJECT_NAME.json'
           file=$(jq -s '.[0][0].TestingAssemblyVersion=env.ver|.[0][0].DownloadLinkTesting="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"|.[0]' $repo $jso)
           echo $file > $repo
