@@ -228,23 +228,13 @@ public unsafe class MZRadialMenu : IDalamudPlugin
         }
         else
         {
-            var actionID = getActionID(2, id);
-            if (actionID == 0)
-            {
-                actionID = id;
-            }
-            // Why??
-            // ActionManager.Instance()->UseAction(ActionType.Item, actionID);
-            useItem(itemContextMenuAgent, actionID, 9999, 0, 0);
+            useItem(itemContextMenuAgent, id, 9999, 0, 0);
         }
     }
 
     [Signature("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 89 7C 24 38")]
     private static delegate* unmanaged<nint, uint, uint, uint, short, void> useItem;
     public static nint itemContextMenuAgent;
-    [Signature("E8 ?? ?? ?? ?? 44 8B 4B 2C")]
-    private static delegate* unmanaged<uint, uint, uint> getActionID;
-
     public void UseItem(string name)
     {
         if (usables.Count == 0) InitUsables();
