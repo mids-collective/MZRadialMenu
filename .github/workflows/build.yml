@@ -35,9 +35,9 @@ jobs:
         run: |
           dotnet build --configuration Release --nologo
       - name: Archive
-        run: 7z a $PROJECT_NAME.zip bin/release/*
+        run: 7z a $PROJECT_NAME.zip ./bin/Release/*.*
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3
         with:
           path: |
-            MZRadialMenu.zip
+            ${{ env.PROJECT_NAME }}.zip
