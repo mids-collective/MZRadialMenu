@@ -8,7 +8,6 @@ namespace MZRadialMenu;
 public unsafe class MZRadialMenu : IDalamudPlugin
 {
     public static MZRadialMenu? Instance;
-    private PluginCommandManager commandManager;
     private List<IDisposable> ServiceList = new();
     public MZRadialMenu(DalamudPluginInterface dpi)
     {
@@ -20,8 +19,7 @@ public unsafe class MZRadialMenu : IDalamudPlugin
         ServiceList.Add(CmdService.Instance);
         ServiceList.Add(WheelService.Instance);
         ServiceList.Add(ConfigService.Instance);
-        commandManager = new PluginCommandManager(this);
-        ServiceList.Add(commandManager);
+        ServiceList.Add(new PluginCommandManager(this));
     }
 
     [Command("/pwheels")]
@@ -33,7 +31,8 @@ public unsafe class MZRadialMenu : IDalamudPlugin
 
     public void Dispose()
     {
-        foreach(var service in ServiceList) {
+        foreach (var service in ServiceList)
+        {
             service.Dispose();
         }
     }
