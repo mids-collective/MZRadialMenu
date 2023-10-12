@@ -14,9 +14,7 @@ public sealed class ConfigService : IDisposable
     public static ConfigService Instance => Service<ConfigService>.Instance;
     private ConfigFile? ConfigWindow;
     private bool ConfigOpen = false;
-    private ConfigService() { }
-    public void Initialize()
-    {
+    private ConfigService() { 
         ConfigWindow = WheelService.Instance.ActiveConfig.DeepCopy();
         DalamudApi.PluginInterface.UiBuilder.Draw += Draw;
         DalamudApi.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfig;

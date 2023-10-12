@@ -12,9 +12,7 @@ public unsafe sealed class UIService : IDisposable
     public RaptureShellModule* raptureShellModule;
     public RaptureMacroModule* raptureMacroModule;
     private AgentModule* agentModule;
-    private UIService() { }
-    public void Initialize()
-    {
+    private UIService() { 
         uiModule = Framework.Instance()->GetUiModule();
         agentModule = uiModule->GetAgentModule();
 

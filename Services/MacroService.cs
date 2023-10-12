@@ -34,10 +34,7 @@ public unsafe sealed class MacroService : IDisposable
                 SafeMemory.WriteBytes(numExecutedMacroLinesPtr, new[] { value });
         }
     }
-    private MacroService() { }
-    public void Initialize()
-    {
-        DalamudApi.GameInteropProvider.InitializeFromAttributes(this);
+    private MacroService() { 
         ExecuteMacroHook = DalamudApi.GameInteropProvider.HookFromSignature<ExecuteMacroDelegate>(macroSig, ExecuteMacroDetour);
         numCopiedMacroLinesPtr = DalamudApi.SigScanner.ScanText("49 8D 5E 70 BF ?? 00 00 00") + 0x5;
         numExecutedMacroLinesPtr = DalamudApi.SigScanner.ScanText("41 83 F8 ?? 0F 8D ?? ?? ?? ?? 49 6B C8 68") + 0x3;

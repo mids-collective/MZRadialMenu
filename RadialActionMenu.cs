@@ -8,26 +8,20 @@ namespace MZRadialMenu;
 public unsafe class MZRadialMenu : IDalamudPlugin
 {
     public static MZRadialMenu? Instance;
-    private PluginCommandManager<MZRadialMenu> commandManager;
-    private List<Action> DisposeActions = new();
+    private PluginCommandManager commandManager;
+    private List<IDisposable> ServiceList = new();
     public MZRadialMenu(DalamudPluginInterface dpi)
     {
         DalamudApi.Initialize(dpi);
         Instance = this;
-        UIService.Instance.Initialize();
-        DisposeActions.Add(UIService.Instance.Dispose);
-        ItemService.Instance.Initialize();
-        DisposeActions.Add(ItemService.Instance.Dispose);
-        MacroService.Instance.Initialize();
-        DisposeActions.Add(MacroService.Instance.Dispose);
-        CmdService.Instance.Initialize();
-        DisposeActions.Add(CmdService.Instance.Dispose);
-        WheelService.Instance.Initialize();
-        DisposeActions.Add(WheelService.Instance.Dispose);
-        ConfigService.Instance.Initialize();
-        DisposeActions.Add(ConfigService.Instance.Dispose);
-        commandManager = new PluginCommandManager<MZRadialMenu>(this);
-        DisposeActions.Add(commandManager.Dispose);
+        ServiceList.Add(UIService.Instance);
+        ServiceList.Add(ItemService.Instance);
+        ServiceList.Add(MacroService.Instance);
+        ServiceList.Add(CmdService.Instance);
+        ServiceList.Add(WheelService.Instance);
+        ServiceList.Add(ConfigService.Instance);
+        commandManager = new PluginCommandManager(this);
+        ServiceList.Add(commandManager);
     }
 
     [Command("/pwheels")]
@@ -39,8 +33,8 @@ public unsafe class MZRadialMenu : IDalamudPlugin
 
     public void Dispose()
     {
-        foreach(Action itm in DisposeActions) {
-            itm.Invoke();
+        foreach(var service in ServiceList) {
+            service.Dispose();
         }
     }
 }

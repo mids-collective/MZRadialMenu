@@ -6,9 +6,7 @@ public sealed class WheelService : IDisposable
 {
     public static WheelService Instance => Service<WheelService>.Instance;
     public ConfigFile? ActiveConfig;
-    private WheelService() { }
-    public void Initialize()
-    {
+    private WheelService() { 
         DalamudApi.PluginInterface.UiBuilder.Draw += Draw;
         ActiveConfig = (ConfigFile?)DalamudApi.PluginInterface.GetPluginConfig() ?? new();
     }

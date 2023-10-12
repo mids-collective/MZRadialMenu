@@ -10,9 +10,7 @@ public unsafe sealed class ItemService : IDisposable
     private delegate* unmanaged<nint, uint, uint, uint, short, void> useItem;
     private Dictionary<uint, string> usables = new();
     private nint itemContextMenuAgent;
-    private ItemService() { }
-    public void Initialize()
-    {
+    private ItemService() { 
         DalamudApi.GameInteropProvider.InitializeFromAttributes(this);
         useItem = (delegate* unmanaged<nint, uint, uint, uint, short, void>)DalamudApi.SigScanner.ScanModule("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 89 7C 24 38");
         InitUsables();

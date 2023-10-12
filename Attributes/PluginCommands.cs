@@ -1,16 +1,14 @@
 using System.Reflection;
-
 using Dalamud.Plugin;
 using Dalamud.Game.Command;
-
 namespace MZRadialMenu.Attributes;
 
 #region PluginCommandManager
-public class PluginCommandManager<T> : IDisposable where T : IDalamudPlugin
+public class PluginCommandManager : IDisposable
 {
-    private readonly T _plugin;
+    private readonly IDalamudPlugin _plugin;
     private readonly (string, CommandInfo)[] _pluginCommands;
-    public PluginCommandManager(T plugin)
+    public PluginCommandManager(IDalamudPlugin plugin)
     {
         _plugin = plugin;
         _pluginCommands = _plugin.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)
