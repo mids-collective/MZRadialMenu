@@ -1,11 +1,7 @@
-using System.Linq;
-using System.Collections.Generic;
 using System.Reflection;
-using System;
 using MZRadialMenu.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using ImComponents;
 
 namespace MZRadialMenu.Config;
 
@@ -13,7 +9,7 @@ namespace MZRadialMenu.Config;
 public abstract class BaseItem
 {
     public abstract bool RenderConfig();
-    public abstract void Render(AdvRadialMenu radialMenu);
+    public abstract void Render();
     public string UUID = Guid.NewGuid().ToString();
     public string Title = string.Empty;
 }

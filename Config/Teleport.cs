@@ -1,11 +1,14 @@
-using System.Linq;
-using MZRadialMenu.Attributes;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using ImGuiNET;
 using ImComponents;
+
 using Lumina.Excel.GeneratedSheets;
+
 using Newtonsoft.Json;
+
+using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
+
+using MZRadialMenu.Attributes;
 
 namespace MZRadialMenu.Config;
 
@@ -68,9 +71,9 @@ public class Teleport : BaseItem
         ImGui.PopID();
         return true;
     }
-    public override void Render(AdvRadialMenu radialMenu)
+    public override void Render()
     {
-        if (radialMenu.RadialMenuItem(Title))
+        if (AdvRadialMenu.Instance.RadialMenuItem(Title))
         {
             Execute();
         }

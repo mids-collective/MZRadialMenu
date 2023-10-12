@@ -1,13 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using ImComponents;
-using MZRadialMenu.Attributes;
-using ImGuiNET;
-using Newtonsoft.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using MZRadialMenu.Attributes;
 using MZRadialMenu.Extensions;
+
+using Newtonsoft.Json;
+
+using ImComponents;
+using ImGuiNET;
 
 namespace MZRadialMenu.Config;
 
@@ -83,7 +82,7 @@ public class Menu : BaseItem
                 DalamudApi.PluginLog.Info(matches.Groups[2].Captures[0].Value);
                 var typ = Type.GetType(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[1].Captures[0].Value)));
                 var obj = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[2].Captures[0].Value)), typ!);
-                (obj as BaseItem)!.UUID = System.Guid.NewGuid().ToString();
+                (obj as BaseItem)!.UUID = Guid.NewGuid().ToString();
                 Sublist.Add((obj as BaseItem)!);
             }
         }
@@ -102,15 +101,15 @@ public class Menu : BaseItem
         ImGui.PopID();
         return show_buttons;
     }
-    public override void Render(AdvRadialMenu radialMenu)
+    public override void Render()
     {
-        if (radialMenu.BeginRadialMenu(Title))
+        if (AdvRadialMenu.Instance.BeginRadialMenu(Title))
         {
             foreach (var sh in Sublist)
             {
-                sh.Render(radialMenu);
+                sh.Render();
             }
-            radialMenu.EndRadialMenu();
+            AdvRadialMenu.Instance.EndRadialMenu();
         }
     }
     public List<BaseItem> Sublist = new();

@@ -1,28 +1,30 @@
-using MZRadialMenu.Attributes;
 using ImComponents;
 using ImGuiNET;
+
 using Newtonsoft.Json;
+
+using MZRadialMenu.Attributes;
 
 namespace MZRadialMenu.Config;
 
 [WheelType("Wheel", true)]
 public class Wheel : Menu
 {
-    public override void Render(AdvRadialMenu radialMenu)
+    public override void Render()
     {
         foreach (var itm in Sublist)
         {
-            itm.Render(radialMenu);
+            itm.Render();
         }
     }
-    public void Render(AdvRadialMenu radialMenu, bool open)
+    public void Render(bool open)
     {
         if (IsOpen)
         {
-            if (radialMenu.BeginRadialPopup("##Wheel", open))
+            if (AdvRadialMenu.Instance.BeginRadialPopup("##Wheel", open))
             {
-                Render(radialMenu);
-                radialMenu.EndRadialMenu();
+                Render();
+                AdvRadialMenu.Instance.EndRadialMenu();
             }
         }
     }

@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -8,6 +6,7 @@ using ImGuiNET;
 
 using MZRadialMenu.Attributes;
 using MZRadialMenu.Structures;
+using MZRadialMenu.Services;
 
 namespace MZRadialMenu.Config;
 
@@ -37,15 +36,15 @@ public class MacroShortcut : BaseItem
         using var ExMacro = new ExtendedMacro(macroPtr, string.Empty, Commands);
         Marshal.StructureToPtr(ExMacro, macroPtr, false);
         var commandCount = (byte)Math.Max(Macro.numLines, Commands.Length);
-        MZRadialMenu.NumCopiedMacroLines = commandCount;
-        MZRadialMenu.NumExecutedMacroLines = commandCount;
-        MZRadialMenu.ExecuteMacroHook!.Original(MZRadialMenu.raptureShellModule, macroPtr);
-        MZRadialMenu.NumCopiedMacroLines = Macro.numLines;
+        MacroService.Instance.NumCopiedMacroLines = commandCount;
+        MacroService.Instance.NumExecutedMacroLines = commandCount;
+        MacroService.Instance.ExecuteMacroHook!.Original(UIService.Instance.raptureShellModule, macroPtr);
+        MacroService.Instance.NumCopiedMacroLines = Macro.numLines;
         Marshal.FreeHGlobal(macroPtr);
     }
-    public override void Render(AdvRadialMenu radialMenu)
+    public override void Render()
     {
-        if (radialMenu.RadialMenuItem(Title))
+        if (AdvRadialMenu.Instance.RadialMenuItem(Title))
         {
             Execute();
         }

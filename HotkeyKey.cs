@@ -14,7 +14,7 @@ public class HotkeyButton
     public VirtualKey key = VirtualKey.NO_KEY;
     [JsonIgnore]
     private bool waitingForKey = false;
-    public System.Guid UUID = System.Guid.NewGuid();
+    public Guid UUID = Guid.NewGuid();
     private void WaitForKey()
     {
         foreach (var ky in DalamudApi.Keys.GetValidVirtualKeys())

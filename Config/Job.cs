@@ -1,9 +1,9 @@
-using System.Linq;
 using ImComponents;
 using ImGuiNET;
 using MZRadialMenu.Attributes;
 using Newtonsoft.Json;
 using Lumina.Excel.GeneratedSheets;
+using MZRadialMenu.Services;
 
 namespace MZRadialMenu.Config;
 
@@ -31,12 +31,12 @@ public class Job : BaseItem
         ImGui.PopID();
         return true;
     }
-    public override void Render(AdvRadialMenu radialMenu)
+    public override void Render()
     {
-        if (radialMenu.RadialMenuItem(Title))
+        if (AdvRadialMenu.Instance.RadialMenuItem(Title))
         {
             DalamudApi.PluginLog.Debug($"{cljb.Where(x => x.NameEnglish.ToString().Equals(Title)).First().NameEnglish.ToString()}");
-            MZRadialMenu.Instance!.ExecuteCommand($"/gs change \"{cljb.Where(x => x.NameEnglish.ToString().Equals(Title)).First().NameEnglish.ToString()}\"");
+            CmdService.Instance.ExecuteCommand($"/gs change \"{cljb.Where(x => x.NameEnglish.ToString().Equals(Title)).First().NameEnglish.ToString()}\"");
         }
     }
     [JsonIgnore]

@@ -1,6 +1,8 @@
-using MZRadialMenu.Attributes;
 using ImGuiNET;
 using ImComponents;
+
+using MZRadialMenu.Attributes;
+using MZRadialMenu.Services;
 
 namespace MZRadialMenu.Config;
 
@@ -21,11 +23,11 @@ public class Shortcut : BaseItem
     }
     public void Execute()
     {
-        MZRadialMenu.Instance!.ExecuteCommand(Command);
+        CmdService.Instance.ExecuteCommand(Command);
     }
-    public override void Render(AdvRadialMenu radialMenu)
+    public override void Render()
     {
-        if (radialMenu.RadialMenuItem(Title))
+        if (AdvRadialMenu.Instance.RadialMenuItem(Title))
         {
             Execute();
         }
