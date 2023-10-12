@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
@@ -7,12 +8,13 @@ public unsafe sealed class ItemService : IDisposable
 {
     public static ItemService Instance => Service<ItemService>.Instance;
     private const int aetherCompassID = 2001886;
-    private delegate* unmanaged<nint, uint, uint, uint, short, void> useItem;
+    private delegate void UseItemDelegate(nint agent, uint cnt, uint itm, uint unk1, short unk2);
+    private UseItemDelegate useItem;
     private Dictionary<uint, string> usables = new();
     private nint itemContextMenuAgent;
-    private ItemService() { 
-        DalamudApi.GameInteropProvider.InitializeFromAttributes(this);
-        useItem = (delegate* unmanaged<nint, uint, uint, uint, short, void>)DalamudApi.SigScanner.ScanModule("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 89 7C 24 38");
+    private ItemService()
+    {
+        useItem = Marshal.GetDelegateForFunctionPointer<UseItemDelegate>(DalamudApi.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 89 7C 24 38"));
         InitUsables();
     }
 
@@ -54,7 +56,8 @@ public unsafe sealed class ItemService : IDisposable
         usables[aetherCompassID] = DalamudApi.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.GetRow(aetherCompassID)?.Name.ToString().ToLower()!;
         itemContextMenuAgent = UIService.Instance.GetAgentByInternalID(AgentId.InventoryContext);
     }
-    public void Dispose() {
+    public void Dispose()
+    {
         usables.Clear();
     }
 }
