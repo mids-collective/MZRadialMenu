@@ -3,7 +3,7 @@ using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 
-namespace MZRadialMenu;
+namespace Plugin;
 public class DalamudApi
 {
     public static void Initialize(DalamudPluginInterface pluginInterface)

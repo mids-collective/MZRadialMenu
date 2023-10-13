@@ -1,7 +1,7 @@
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace MZRadialMenu.Structures;
+namespace Plugin.Structures;
 
 [StructLayout(LayoutKind.Sequential, Size = 0x68)]
 public readonly struct UTF8String : IDisposable

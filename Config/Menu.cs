@@ -1,7 +1,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
-using MZRadialMenu.Attributes;
-using MZRadialMenu.Extensions;
+
+using Plugin;
+using Plugin.Attributes;
 
 using Newtonsoft.Json;
 

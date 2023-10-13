@@ -8,7 +8,9 @@ using Newtonsoft.Json;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
-using MZRadialMenu.Attributes;
+using Plugin.Attributes;
+
+using Plugin;
 
 namespace MZRadialMenu.Config;
 

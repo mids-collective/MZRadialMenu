@@ -1,9 +1,10 @@
 using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using MZRadialMenu.Structures;
+using Plugin.Structures;
 
-namespace MZRadialMenu.Services;
-public unsafe sealed class CmdService : IDisposable
+namespace Plugin.Services;
+
+public unsafe sealed class CmdService : IService<CmdService>
 {
     public static CmdService Instance => Service<CmdService>.Instance;
     private const string ChatBoxSig = "48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9";

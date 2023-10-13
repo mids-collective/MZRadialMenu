@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 using ImComponents;
 using ImGuiNET;
 
-using MZRadialMenu.Attributes;
-using MZRadialMenu.Structures;
-using MZRadialMenu.Services;
+using Plugin.Attributes;
+using Plugin.Structures;
+using Plugin.Services;
 
 namespace MZRadialMenu.Config;
 

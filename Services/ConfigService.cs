@@ -1,5 +1,4 @@
 using ImGuiNET;
-using MZRadialMenu.Extensions;
 
 using Dalamud.Game.ClientState.Keys;
 using Newtonsoft.Json;
@@ -7,18 +6,30 @@ using System.Text;
 
 using MZRadialMenu.Config;
 
-namespace MZRadialMenu.Services;
+namespace Plugin.Services;
 
-public sealed class ConfigService : IDisposable
+public sealed class ConfigService : IService<ConfigService>
 {
     public static ConfigService Instance => Service<ConfigService>.Instance;
-    private ConfigFile? ConfigWindow;
+    private ConfigFile Config;
     private bool ConfigOpen = false;
-    private ConfigService() { 
-        ConfigWindow = WheelService.Instance.ActiveConfig.DeepCopy();
+    private ConfigService()
+    {
+        Config = (ConfigFile?)DalamudApi.PluginInterface.GetPluginConfig() ?? new();
         DalamudApi.PluginInterface.UiBuilder.Draw += Draw;
         DalamudApi.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfig;
+        CmdMgrService.Instance.AddCommand("/wheels", ToggleConfig);
     }
+
+    public ConfigFile GetConfig()
+    {
+        return Config;
+    }
+    private void ToggleConfig(string cmd, string args)
+    {
+        ToggleConfig();
+    }
+
     private void Draw()
     {
         if (ConfigOpen)
@@ -27,13 +38,13 @@ public sealed class ConfigService : IDisposable
             var size = ImGui.GetContentRegionAvail();
             size.Y -= 30;
             ImGui.BeginChild("Configuration", size);
-            for (int c = 0; c < ConfigWindow!.WheelSet.Count; c++)
+            for (int c = 0; c < Config!.WheelSet.Count; c++)
             {
-                var Item = ConfigWindow.WheelSet[c];
+                var Item = Config.WheelSet[c];
                 ImGui.PushID(Item.UUID.ToString());
                 if (ImGui.Button("X"))
                 {
-                    ConfigWindow.WheelSet.RemoveAt(c);
+                    Config.WheelSet.RemoveAt(c);
                 }
                 ImGui.SameLine();
                 if (ImGui.Button("Export Wheel"))
@@ -58,7 +69,7 @@ public sealed class ConfigService : IDisposable
             ImGui.Separator();
             if (ImGui.Button("New Wheel"))
             {
-                ConfigWindow.WheelSet.Add(new Wheel());
+                Config.WheelSet.Add(new Wheel());
             }
             ImGui.SameLine();
             if (ImGui.Button("Import Wheel"))
@@ -70,7 +81,7 @@ public sealed class ConfigService : IDisposable
                     var obj = JsonConvert.DeserializeObject<Wheel>(Encoding.UTF8.GetString(Convert.FromBase64String(clip)))!;
                     obj.UUID = Guid.NewGuid().ToString();
                     obj.key.key = VirtualKey.NO_KEY;
-                    ConfigWindow.WheelSet.Add(obj);
+                    Config.WheelSet.Add(obj);
                 }
             }
             ImGui.SameLine();
@@ -80,24 +91,24 @@ public sealed class ConfigService : IDisposable
             if (ImGui.Button("Save and Close"))
             {
                 ConfigOpen = false;
-                WheelService.Instance.ActiveConfig = ConfigWindow.DeepCopy();
+                WheelService.Instance.SetConfig(Config);
             }
             ImGui.SameLine();
             if (ImGui.Button("Save"))
             {
-                WheelService.Instance.ActiveConfig = ConfigWindow.DeepCopy();
-                DalamudApi.PluginInterface.SavePluginConfig(WheelService.Instance.ActiveConfig);
+                WheelService.Instance.SetConfig(Config);
+                DalamudApi.PluginInterface.SavePluginConfig(Config);
             }
             ImGui.SameLine();
             if (ImGui.Button("Revert"))
             {
-                ConfigWindow = WheelService.Instance.ActiveConfig.DeepCopy();
+                Config = WheelService.Instance.GetConfig().DeepCopy();
             }
             ImGui.SameLine();
             if (ImGui.Button("Close"))
             {
                 ConfigOpen = false;
-                ConfigWindow = WheelService.Instance.ActiveConfig.DeepCopy();
+                Config = WheelService.Instance.GetConfig().DeepCopy();
             }
             ImGui.End();
         }

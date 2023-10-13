@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace MZRadialMenu.Attributes;
+namespace Plugin.Attributes;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
 public class WheelTypeAttribute : Attribute

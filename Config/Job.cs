@@ -1,9 +1,12 @@
 using ImComponents;
 using ImGuiNET;
-using MZRadialMenu.Attributes;
 using Newtonsoft.Json;
 using Lumina.Excel.GeneratedSheets;
-using MZRadialMenu.Services;
+
+using Plugin;
+using Plugin.Services;
+using Plugin.Attributes;
+
 
 namespace MZRadialMenu.Config;
 

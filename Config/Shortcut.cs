@@ -1,8 +1,8 @@
 using ImGuiNET;
 using ImComponents;
 
-using MZRadialMenu.Attributes;
-using MZRadialMenu.Services;
+using Plugin.Attributes;
+using Plugin.Services;
 
 namespace MZRadialMenu.Config;
 

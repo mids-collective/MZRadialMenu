@@ -1,7 +1,7 @@
 using Dalamud.Configuration;
 using MZRadialMenu.Config;
 
-namespace MZRadialMenu;
+namespace Plugin;
 public class ConfigFile : IPluginConfiguration
 {
     public List<Wheel> WheelSet = new();

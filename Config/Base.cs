@@ -1,8 +1,8 @@
 using System.Reflection;
-using MZRadialMenu.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using Plugin.Attributes;
 namespace MZRadialMenu.Config;
 
 [JsonConverter(typeof(Converter))]
@@ -22,7 +22,7 @@ public class Converter : JsonConverter
     public List<Type> Conversions;
     public override bool CanRead => true;
     public override bool CanWrite => true;
-    public override bool CanConvert(System.Type objectType)
+    public override bool CanConvert(Type objectType)
     {
         return Conversions.Contains(objectType);
     }
@@ -43,7 +43,7 @@ public class Converter : JsonConverter
         jObj.Add(new JProperty("Type", new JValue(value.GetType().FullName)));
         jObj.WriteTo(writer);
     }
-    public override object ReadJson(JsonReader reader, System.Type objectType, object? existingValue, JsonSerializer serializer)
+    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         var jsonObj = JObject.Load(reader);
         var obj = Activator.CreateInstance(Conversions.Where(x => x.FullName == (string)jsonObj["Type"]!.Value<string>()!).First());
@@ -79,6 +79,6 @@ public class Converter : JsonConverter
                 }
             }
         }
-        return (object)obj;
+        return obj;
     }
 }

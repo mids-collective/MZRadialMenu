@@ -3,7 +3,7 @@ using ImGuiNET;
 
 using Newtonsoft.Json;
 
-using MZRadialMenu.Attributes;
+using Plugin.Attributes;
 
 namespace MZRadialMenu.Config;
 

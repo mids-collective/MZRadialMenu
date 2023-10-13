@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace MZRadialMenu.Extensions;
+namespace Plugin;
 public static class ExtensionMethods
 {
     public static T DeepCopy<T>(this T self)

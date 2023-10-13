@@ -2,9 +2,9 @@ using System.Runtime.InteropServices;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
-namespace MZRadialMenu.Services;
+namespace Plugin.Services;
 
-public unsafe sealed class ItemService : IDisposable
+public unsafe sealed class ItemService : IService<ItemService>
 {
     public static ItemService Instance => Service<ItemService>.Instance;
     private const int aetherCompassID = 2001886;
