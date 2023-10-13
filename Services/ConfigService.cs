@@ -18,7 +18,7 @@ public sealed class ConfigService : IService<ConfigService>
         Config = (ConfigFile?)DalamudApi.PluginInterface.GetPluginConfig() ?? new();
         DalamudApi.PluginInterface.UiBuilder.Draw += Draw;
         DalamudApi.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfig;
-        CmdMgrService.Instance.AddCommand("/wheels", ToggleConfig);
+        CmdMgrService.Instance.AddCommand("/wheels", ToggleConfig, "Toggle Configuration GUI");
     }
 
     public ConfigFile GetConfig()
