@@ -7,9 +7,13 @@ namespace Plugin.Services;
 public unsafe sealed class CmdService : IService<CmdService>
 {
     public static CmdService Instance => Service<CmdService>.Instance;
-    private const string ChatBoxSig = "48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9";
-    private CmdService() { 
-        ProcessChatBox = Marshal.GetDelegateForFunctionPointer<ProcessChatBoxDelegate>(DalamudApi.SigScanner.ScanModule(ChatBoxSig));
+    public static void Execute(string cmd) => Instance.ExecuteCommand(cmd);
+    // Command Execution
+    private delegate void ProcessChatBoxDelegate(UIModule* uiModule, nint message, nint unused, byte a4);
+    private ProcessChatBoxDelegate? ProcessChatBox;
+    private CmdService()
+    {
+        ProcessChatBox = Marshal.GetDelegateForFunctionPointer<ProcessChatBoxDelegate>(DalamudApi.SigScanner.ScanModule(SigService.GetSig("ProcessChatBox")));
     }
 
     public void ExecuteCommand(string command)
@@ -20,14 +24,11 @@ public unsafe sealed class CmdService : IService<CmdService>
             switch (command[0])
             {
                 case 'i':
-                    ItemService.Instance.UseItem(command[2..]);
+                    ItemService.Instance.Use(command[2..]);
                     break;
                 case 'm':
-                    int.TryParse(command[1..], out int val);
-                    if (val is >= 0 and < 200)
-                    {
-                        MacroService.Instance.ExecuteMacroHook!.Original(UIService.Instance.raptureShellModule, (nint)UIService.Instance.raptureMacroModule + 0x58 + (Macro.size * val));
-                    }
+                    int.TryParse(command[1..], out int id);
+                    MacroService.Execute(id);
                     break;
             }
             return;
@@ -46,10 +47,6 @@ public unsafe sealed class CmdService : IService<CmdService>
         }
         Marshal.FreeHGlobal(stringPtr);
     }
-
-    // Command Execution
-    private delegate void ProcessChatBoxDelegate(UIModule* uiModule, nint message, nint unused, byte a4);
-    private ProcessChatBoxDelegate? ProcessChatBox;
     public void Dispose()
     {
     }

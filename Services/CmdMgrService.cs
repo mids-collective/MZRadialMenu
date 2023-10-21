@@ -4,7 +4,8 @@ namespace Plugin.Services;
 public sealed class CmdMgrService : IService<CmdMgrService>
 {
     public static CmdMgrService Instance => Service<CmdMgrService>.Instance;
-    private List<string> pluginCommands;
+    public static void Command(string cmd, CommandInfo.HandlerDelegate handle, string helpMessage = "Message to show in help", bool showInHelp = true, string[]? aliases = null) => Instance.AddCommand(cmd, handle, helpMessage, showInHelp, aliases);
+    private HashSet<string> pluginCommands;
     private CmdMgrService()
     {
         pluginCommands = new();

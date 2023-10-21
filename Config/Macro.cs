@@ -4,42 +4,35 @@ using System.Runtime.InteropServices;
 using ImComponents;
 using ImGuiNET;
 
-using Plugin.Attributes;
 using Plugin.Structures;
 using Plugin.Services;
+using Plugin.Attributes;
 
 namespace MZRadialMenu.Config;
 
 //Virtual macros?
 //Need to limit text output macros
-[WheelType("Macro", false)]
-public class MacroShortcut : BaseItem
+[Rename("MacroShortcut")]
+public class Macro : BaseItem
 {
-    public override bool RenderConfig()
+    public override void RenderConfig()
     {
-        ImGui.PushID(UUID);
-        if (ImGui.TreeNode(UUID, Title))
-        {
-            ImGui.InputText($"Title###{UUID}#Title", ref Title, 0xF);
-            ImGui.Text($"Macro Commands");
-            var combinds = String.Join('\n', Commands);
-            ImGui.InputTextMultiline($"###{UUID}#Commands", ref combinds, 0x41 * 30, new Vector2(ImGui.CalcItemWidth(), 200));
-            Commands = combinds.Split('\n').Where(x => !String.IsNullOrEmpty(x)).Take(30).ToArray();
-            ImGui.TreePop();
-        }
-        ImGui.PopID();
-        return true;
+        ImGui.InputText($"Title##{GetID()}", ref Title, 0xF);
+        ImGui.Text($"Macro Commands");
+        var combinds = string.Join('\n', Commands);
+        ImGui.InputTextMultiline($"Commands##{GetID()}", ref combinds, 0x41 * 30, new Vector2(ImGui.CalcItemWidth(), 200));
+        Commands = combinds.Split('\n').Where(x => !string.IsNullOrEmpty(x)).Take(30).ToList();
     }
     public unsafe void Execute()
     {
         var macroPtr = Marshal.AllocHGlobal(ExtendedMacro.size);
         using var ExMacro = new ExtendedMacro(macroPtr, string.Empty, Commands);
         Marshal.StructureToPtr(ExMacro, macroPtr, false);
-        var commandCount = (byte)Math.Max(Macro.numLines, Commands.Length);
+        var commandCount = (byte)Math.Max(MacroStruct.numLines, Commands.Count);
         MacroService.Instance.NumCopiedMacroLines = commandCount;
         MacroService.Instance.NumExecutedMacroLines = commandCount;
         MacroService.Instance.ExecuteMacroHook!.Original(UIService.Instance.raptureShellModule, macroPtr);
-        MacroService.Instance.NumCopiedMacroLines = Macro.numLines;
+        MacroService.Instance.NumCopiedMacroLines = MacroStruct.numLines;
         Marshal.FreeHGlobal(macroPtr);
     }
     public override void Render()
@@ -49,5 +42,5 @@ public class MacroShortcut : BaseItem
             Execute();
         }
     }
-    public string[] Commands = new string[0];
+    public List<string> Commands = new();
 }

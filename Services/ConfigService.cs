@@ -5,112 +5,119 @@ using Newtonsoft.Json;
 using System.Text;
 
 using MZRadialMenu.Config;
+using System.Text.RegularExpressions;
 
 namespace Plugin.Services;
 
 public sealed class ConfigService : IService<ConfigService>
 {
     public static ConfigService Instance => Service<ConfigService>.Instance;
-    private ConfigFile Config;
+    public static ConfigFile Config() => Instance.GetConfig();
+    private ConfigFile _config;
     private bool ConfigOpen = false;
     private ConfigService()
     {
-        Config = (ConfigFile?)DalamudApi.PluginInterface.GetPluginConfig() ?? new();
+        _config = (ConfigFile?)DalamudApi.PluginInterface.GetPluginConfig() ?? new();
         DalamudApi.PluginInterface.UiBuilder.Draw += Draw;
         DalamudApi.PluginInterface.UiBuilder.OpenConfigUi += ToggleConfig;
-        CmdMgrService.Instance.AddCommand("/wheels", ToggleConfig, "Toggle Configuration GUI");
+        CmdMgrService.Command("/wheels", ToggleConfig, "Toggle Configuration GUI");
     }
 
-    public ConfigFile GetConfig()
+    private ConfigFile GetConfig()
     {
-        return Config;
+        return _config;
     }
     private void ToggleConfig(string cmd, string args)
     {
         ToggleConfig();
     }
-
+    private void PopupCB(IMenu item)
+    {
+        int i = _config.WheelSet.FindIndex(x => x.GetID() == item.GetID());
+        ImGui.SameLine();
+        if (ImGui.Button($"Delete wheel##{item.GetID()}"))
+        {
+            ImGui.CloseCurrentPopup();
+            _config.WheelSet.RemoveAt(i);
+        }
+    }
+    private void DrawMenuBar()
+    {
+        if (ImGui.BeginMenuBar())
+        {
+            if (ImGui.BeginMenu("Wheels"))
+            {
+                if (ImGui.MenuItem("New Wheel"))
+                {
+                    var wheel = new Wheel();
+                    wheel.SetTitle("New Wheel");
+                    _config.WheelSet.Add(new Wheel());
+                }
+                if (ImGui.MenuItem("Import Wheel"))
+                {
+                    var clip = ImGui.GetClipboardText();
+                    var regex = new Regex(@"MZRW_\((.*)\)");
+                    var matches = regex.Matches(clip);
+                    foreach (var match in matches.ToHashSet())
+                    {
+                        var obj = JsonConvert.DeserializeObject<Wheel>(Encoding.UTF8.GetString(Convert.FromBase64String(match.Groups[1].Captures[0].Value)));
+                        if (obj != null)
+                        {
+                            obj.ResetID();
+                            obj.key.key = VirtualKey.NO_KEY;
+                            _config.WheelSet.Add(obj);
+                        }
+                    }
+                }
+                if (ImGui.MenuItem("Save and Close"))
+                {
+                    ConfigOpen = false;
+                    WheelService.Instance.SetConfig(_config);
+                }
+                if (ImGui.MenuItem("Save"))
+                {
+                    WheelService.Instance.SetConfig(_config);
+                    DalamudApi.PluginInterface.SavePluginConfig(_config);
+                }
+                if (ImGui.MenuItem("Revert"))
+                {
+                    _config = WheelService.Instance.GetConfig().DeepCopy();
+                }
+                if (ImGui.MenuItem("Close"))
+                {
+                    ConfigOpen = false;
+                    _config = WheelService.Instance.GetConfig().DeepCopy();
+                }
+                ImGui.EndMenu();
+            }
+            ImGui.EndMenuBar();
+        }
+    }
     private void Draw()
     {
+        if (DalamudApi.PluginInterface.IsDevMenuOpen)
+        {
+            if (ImGui.BeginMainMenuBar())
+            {
+                if (ImGui.MenuItem("Wheel Menu"))
+                {
+                    ToggleConfig();
+                }
+                ImGui.EndMainMenuBar();
+            }
+        }
         if (ConfigOpen)
         {
-            ImGui.Begin("MZ Radial Menu Config", ref ConfigOpen);
-            var size = ImGui.GetContentRegionAvail();
-            size.Y -= 30;
-            ImGui.BeginChild("Configuration", size);
-            for (int c = 0; c < Config!.WheelSet.Count; c++)
+            if (ImGui.Begin("MZ Radial Menu Config", ref ConfigOpen, ImGuiWindowFlags.MenuBar))
             {
-                var Item = Config.WheelSet[c];
-                ImGui.PushID(Item.UUID.ToString());
-                if (ImGui.Button("X"))
+                DrawMenuBar();
+                for (int c = 0; c < _config!.WheelSet.Count; c++)
                 {
-                    Config.WheelSet.RemoveAt(c);
+                    var Item = _config.WheelSet[c];
+                    Item.Config(PopupCB);
                 }
-                ImGui.SameLine();
-                if (ImGui.Button("Export Wheel"))
-                {
-                    var cpy = Item.DeepCopy();
-                    cpy.UUID = string.Empty;
-                    cpy.key.key = VirtualKey.NO_KEY;
-                    var json = JsonConvert.SerializeObject(cpy);
-                    var exp = $"MZRW_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
-                    ImGui.SetClipboardText(exp);
-                }
-                ImGui.SameLine();
-                if (ImGui.TreeNode(Item.UUID.ToString(), Item.Title))
-                {
-                    Item.key.Render();
-                    Item.RawRender();
-                    ImGui.TreePop();
-                }
-                ImGui.PopID();
+                ImGui.End();
             }
-            ImGui.EndChild();
-            ImGui.Separator();
-            if (ImGui.Button("New Wheel"))
-            {
-                Config.WheelSet.Add(new Wheel());
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("Import Wheel"))
-            {
-                var clip = ImGui.GetClipboardText();
-                if (clip.StartsWith("MZRW_("))
-                {
-                    clip = clip[6..^1];
-                    var obj = JsonConvert.DeserializeObject<Wheel>(Encoding.UTF8.GetString(Convert.FromBase64String(clip)))!;
-                    obj.UUID = Guid.NewGuid().ToString();
-                    obj.key.key = VirtualKey.NO_KEY;
-                    Config.WheelSet.Add(obj);
-                }
-            }
-            ImGui.SameLine();
-            var pos = ImGui.GetCursorPos();
-            pos.X = size.X - 220;
-            ImGui.SetCursorPos(pos);
-            if (ImGui.Button("Save and Close"))
-            {
-                ConfigOpen = false;
-                WheelService.Instance.SetConfig(Config);
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("Save"))
-            {
-                WheelService.Instance.SetConfig(Config);
-                DalamudApi.PluginInterface.SavePluginConfig(Config);
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("Revert"))
-            {
-                Config = WheelService.Instance.GetConfig().DeepCopy();
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("Close"))
-            {
-                ConfigOpen = false;
-                Config = WheelService.Instance.GetConfig().DeepCopy();
-            }
-            ImGui.End();
         }
     }
 

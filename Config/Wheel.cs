@@ -1,15 +1,33 @@
+using System.Text;
+using Dalamud.Game.ClientState.Keys;
 using ImComponents;
 using ImGuiNET;
-
 using Newtonsoft.Json;
-
+using Plugin;
 using Plugin.Attributes;
 
 namespace MZRadialMenu.Config;
 
-[WheelType("Wheel", true)]
+[Hidden]
 public class Wheel : Menu
 {
+    public Wheel() : base()
+    {
+        RegisterCallback(WheelPopup);
+    }
+    private void WheelPopup(IMenu item)
+    {
+        key.Render();
+        if (ImGui.Button($"Export Wheel##{item.GetID()}"))
+        {
+            var cpy = (Wheel)item.DeepCopy();
+            cpy.ClearID();
+            cpy.key.key = VirtualKey.NO_KEY;
+            var json = JsonConvert.SerializeObject(cpy);
+            var exp = $"MZRW_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
+            ImGui.SetClipboardText(exp);
+        }
+    }
     public override void Render()
     {
         foreach (var itm in Sublist)
@@ -21,26 +39,12 @@ public class Wheel : Menu
     {
         if (IsOpen)
         {
-            if (AdvRadialMenu.Instance.BeginRadialPopup("##Wheel", open))
+            if (AdvRadialMenu.Instance.BeginRadialPopup($"##Wheel", open))
             {
                 Render();
                 AdvRadialMenu.Instance.EndRadialMenu();
             }
         }
-    }
-    public override bool RenderConfig()
-    {
-        bool show_buttons = true;
-        ImGui.PushID(UUID);
-        if (ImGui.TreeNode(UUID, Title))
-        {
-            show_buttons = false;
-            key.Render();
-            show_buttons &= base.RawRender();
-            ImGui.TreePop();
-        }
-        ImGui.PopID();
-        return show_buttons;
     }
     public HotkeyButton key = new();
     [JsonIgnore]

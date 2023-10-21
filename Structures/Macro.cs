@@ -5,7 +5,7 @@ namespace Plugin.Structures;
 
 //Basically taken from QoLBar
 [StructLayout(LayoutKind.Sequential, Size = 0x688)]
-public readonly struct Macro : IDisposable
+public readonly struct MacroStruct : IDisposable
 {
     public const int numLines = 15;
     public const int size = 0x8 + (UTF8String.size * (numLines + 1));
@@ -16,7 +16,7 @@ public readonly struct Macro : IDisposable
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = numLines)]
     public readonly UTF8String[] lines;
 
-    public Macro(IntPtr loc, string t, IReadOnlyList<string> commands)
+    public MacroStruct(IntPtr loc, string t, IReadOnlyList<string> commands)
     {
         icon = 0x101D1; // 66001
         key = 1;

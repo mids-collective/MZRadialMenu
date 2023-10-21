@@ -1,84 +1,117 @@
 using System.Reflection;
+using ImGuiNET;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 using Plugin.Attributes;
+
 namespace MZRadialMenu.Config;
 
-[JsonConverter(typeof(Converter))]
-public abstract class BaseItem
+public delegate void PopupCallback(IMenu obj);
+
+[JsonConverter(typeof(Converter<IMenu>))]
+public interface IMenu
 {
-    public abstract bool RenderConfig();
+    public void RegisterCallback(PopupCallback cb);
+    public bool RemoveCallback(PopupCallback cb);
+    public void Render();
+    public void RenderConfig();
+    public void Config(PopupCallback? CustomCallback = null);
+    public string GetID();
+    public void SetID(string id);
+    public string GetTitle();
+    public ref string GetTitleRef();
+    public void SetTitle(string title);
+    public void ClearID();
+    public void ResetID();
+}
+
+public abstract class BaseItem : IMenu
+{
+    private List<PopupCallback> _callbacks = new();
+    public void RegisterCallback(PopupCallback cb) => _callbacks.Add(cb);
+    public bool RemoveCallback(PopupCallback cb) => _callbacks.Remove(cb);
     public abstract void Render();
+    public abstract void RenderConfig();
+    public void Config(PopupCallback? CustomCallback = null)
+    {
+        var open = ImGui.TreeNodeEx(GetID(), ImGuiTreeNodeFlags.Framed, GetTitle());
+        if (_callbacks.Count != 0 || CustomCallback != null)
+        {
+            if (ImGui.BeginPopupContextItem())
+            {
+                foreach (var cb in _callbacks)
+                {
+                    cb(this);
+                }
+                CustomCallback?.Invoke(this);
+                ImGui.EndPopup();
+            }
+        }
+        if (open)
+        {
+            RenderConfig();
+            ImGui.TreePop();
+        }
+    }
+
+    public string GetID() => UUID;
+    public void SetID(string id) => UUID = id;
+    public virtual void ClearID() => UUID = string.Empty;
+    public virtual void ResetID() => UUID = Guid.NewGuid().ToString();
+    public void SetTitle(string title) => Title = title;
+    public string GetTitle() => Title;
+    public ref string GetTitleRef() => ref Title;
     public string UUID = Guid.NewGuid().ToString();
     public string Title = string.Empty;
 }
-public class Converter : JsonConverter
+
+public class Converter<T> : JsonConverter
 {
     public Converter()
     {
-        Conversions = Registry.GetTypes<WheelTypeAttribute>();
+        Renames = Registry.TypeRenames();
+        Conversions = Registry.GetTypes<T>();
     }
+    public Dictionary<string, string> Renames;
     public List<Type> Conversions;
     public override bool CanRead => true;
     public override bool CanWrite => true;
-    public override bool CanConvert(Type objectType)
-    {
-        return Conversions.Contains(objectType);
-    }
+    public override bool CanConvert(Type objectType) => Conversions.Contains(objectType);
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        var jObj = new JObject();
-        var typ = value!.GetType();
-        foreach (var field in typ.GetFields())
+        if (value != null)
         {
-            if (field.GetCustomAttribute<JsonIgnoreAttribute>() != null)
+            if (Conversions.Contains(value.GetType()))
             {
-                continue;
+                var typ = value.GetType();
+                var jObj = new JObject();
+                foreach (var itm in typ.GetFields())
+                {
+                    if (itm.FieldType.GetCustomAttribute<JsonIgnoreAttribute>() == null)
+                    {
+                        jObj[itm.Name] = JToken.FromObject(itm.GetValue(value)!);
+                    }
+                }
+                jObj["Type"] = new JValue(value.GetType().FullName);
+                jObj.WriteTo(writer);
             }
-            var tmp = new JTokenWriter();
-            serializer.Serialize(tmp, field.GetValue(value), field.FieldType);
-            jObj.Add(new JProperty(field.Name, tmp.Token));
+            else
+            {
+                serializer.Serialize(writer, value);
+            }
         }
-        jObj.Add(new JProperty("Type", new JValue(value.GetType().FullName)));
-        jObj.WriteTo(writer);
     }
     public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         var jsonObj = JObject.Load(reader);
-        var obj = Activator.CreateInstance(Conversions.Where(x => x.FullName == (string)jsonObj["Type"]!.Value<string>()!).First());
-        jsonObj.Remove("Type");
-        var typ = obj!.GetType();
-        foreach (var vobj in jsonObj)
+        var ti = jsonObj["Type"]!.Value<string>()!;
+        if (Renames.ContainsKey(ti))
         {
-            var f = typ.GetField(vobj.Key);
-            if (f!.FieldType.IsClass && f.FieldType != typeof(string) && f.FieldType.GetElementType() != typeof(string))
-            {
-                var tmp = Activator.CreateInstance(f.FieldType);
-                serializer.Populate(vobj.Value!.CreateReader(), tmp!);
-                f.SetValue(obj, tmp);
-            }
-            else
-            {
-                switch (vobj.Value!.Type)
-                {
-                    case JTokenType.String:
-                        f.SetValue(obj, (string)vobj.Value!);
-                        break;
-                    case JTokenType.Boolean:
-                        f.SetValue(obj, (bool)vobj.Value);
-                        break;
-                    case JTokenType.Array:
-                        switch (Type.GetTypeCode(f.FieldType.GetElementType()))
-                        {
-                            case TypeCode.String:
-                                f.SetValue(obj, vobj.Value.Values<string>().ToArray());
-                                break;
-                        }
-                        break;
-                }
-            }
+            ti = Renames[ti];
         }
-        return obj;
+        jsonObj.Remove("Type");
+        var obj = Activator.CreateInstance(Conversions.Where(x => x.Name == ti || x.FullName == ti).First());
+        serializer.Populate(jsonObj.CreateReader(), obj!);
+        return obj ?? new Menu();
     }
 }

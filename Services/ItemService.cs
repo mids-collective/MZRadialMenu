@@ -14,11 +14,11 @@ public unsafe sealed class ItemService : IService<ItemService>
     private nint itemContextMenuAgent;
     private ItemService()
     {
-        useItem = Marshal.GetDelegateForFunctionPointer<UseItemDelegate>(DalamudApi.SigScanner.ScanText("E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 89 7C 24 38"));
+        useItem = Marshal.GetDelegateForFunctionPointer<UseItemDelegate>(DalamudApi.SigScanner.ScanText(SigService.GetSig("UseItem")));
         InitUsables();
     }
 
-    public void UseItem(string name)
+    public void Use(string name)
     {
         if (usables.Count == 0) InitUsables();
         if (string.IsNullOrWhiteSpace(name)) return;

@@ -1,110 +1,94 @@
 using System.Text;
-using System.Text.RegularExpressions;
-
 using Plugin;
-using Plugin.Attributes;
-
 using Newtonsoft.Json;
-
 using ImComponents;
 using ImGuiNET;
+using System.Text.RegularExpressions;
+using Plugin.Attributes;
+using System.Reflection;
 
 namespace MZRadialMenu.Config;
 
-[WheelType("Menu", false)]
 public class Menu : BaseItem
 {
-    public bool RawRender()
+    public Menu() : base()
     {
-        bool show_buttons = true;
-        ImGui.InputText("Title", ref Title, 0xF);
-        for (int i = 0; i < Sublist.Count; i++)
+        RegisterCallback(MenuPopup);
+        RegisterCallback(AddItemPopup);
+    }
+    private int current_item;
+    public void AddItemPopup(IMenu ti)
+    {
+        ImGui.Text("Item to add");
+        ImGui.ListBox($"##{ti.GetID()}", ref current_item, item_names.ToArray(), item_names.Count);
+        if (ImGui.Button("Add Item"))
         {
-            var Item = Sublist[i];
-            ImGui.PushID(Item.UUID);
-            if (ImGui.Button("X"))
-            {
-                Sublist.RemoveAt(i);
-            }
-
-            ImGui.SameLine();
-            if (ImGui.ArrowButton("##Up", ImGuiDir.Up))
-            {
-                var temp = Sublist[i - 1];
-                Sublist.RemoveAt(i - 1);
-                Sublist.Insert(i, temp);
-            }
-            ImGui.SameLine();
-            if (ImGui.ArrowButton("##Down", ImGuiDir.Down))
-            {
-                var temp = Sublist[i + 1];
-                Sublist.RemoveAt(i + 1);
-                Sublist.Insert(i, temp);
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("Export Item"))
-            {
-                var cpy = Item.DeepCopy();
-                cpy.UUID = string.Empty;
-                var json = JsonConvert.SerializeObject(cpy);
-                var exp = $"MZRM_({Convert.ToBase64String(Encoding.UTF8.GetBytes(Sublist[i].GetType().AssemblyQualifiedName!))})_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
-                ImGui.SetClipboardText(exp);
-            }
-            ImGui.SameLine();
-            show_buttons &= Item.RenderConfig();
-            ImGui.PopID();
+            var item = Activator.CreateInstance(types[current_item]);
+            Sublist.Add((item as IMenu)!);
         }
-        if (show_buttons)
+    }
+    public void MenuPopup(IMenu ti)
+    {
+        ImGui.InputText($"Title##{ti.GetID()}", ref Title, 0xF);
+        if (ImGui.Button($"Import from clipboard##{ti.GetID()}"))
         {
-            int c = 0;
-            foreach (var t in Types)
+            var clip = ImGui.GetClipboardText();
+            var regex = new Regex(@"MZRI_\((?<import>.*)\)");
+            var matches = regex.Matches(clip).ToHashSet();
+            foreach (var match in matches)
             {
-                if (!t.Value.Hide)
+                var import = match.Groups["import"].Value;
+                var obj = JsonConvert.DeserializeObject<IMenu>(Encoding.UTF8.GetString(Convert.FromBase64String(import)));
+                if (obj != null)
                 {
-                    ImGui.PushID(UUID);
-                    if (ImGui.Button($"+ {t.Value.Name}"))
-                    {
-                        Sublist.Add((Activator.CreateInstance(t.Key) as BaseItem)!);
-                    }
-                    if (++c != Types.Count - 1)
-                    {
-                        ImGui.SameLine();
-                    }
-                    ImGui.PopID();
+                    obj.ResetID();
+                    Sublist.Add(obj);
                 }
             }
-            ImGui.SameLine();
-            if (ImGui.Button("Import Item"))
-            {
-                var clip = ImGui.GetClipboardText();
-                var regex = new Regex(@"MZRM_\((.*)\)_\((.*)\)");
-                var matches = regex.Match(clip);
-                DalamudApi.PluginLog.Info(matches.Groups[1].Captures[0].Value);
-                DalamudApi.PluginLog.Info(matches.Groups[2].Captures[0].Value);
-                var typ = Type.GetType(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[1].Captures[0].Value)));
-                var obj = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(Convert.FromBase64String(matches.Groups[2].Captures[0].Value)), typ!);
-                (obj as BaseItem)!.UUID = Guid.NewGuid().ToString();
-                Sublist.Add((obj as BaseItem)!);
-            }
         }
-        return show_buttons;
     }
-    public override bool RenderConfig()
+    public void GenericPopup(IMenu ti)
     {
-        bool show_buttons = true;
-        ImGui.PushID(UUID);
-        if (ImGui.TreeNode(UUID, Title))
+        var i = Sublist.FindIndex(x => x.GetID() == ti.GetID());
+        if (ImGui.Button($"Export to clipboard##{ti.GetID()}"))
         {
-            show_buttons = false;
-            RawRender();
-            ImGui.TreePop();
+            var cpy = ti.DeepCopy();
+            cpy.ClearID();
+            var json = JsonConvert.SerializeObject(cpy);
+            var exp = $"MZRI_({Convert.ToBase64String(Encoding.UTF8.GetBytes(json))})";
+            ImGui.SetClipboardText(exp);
         }
-        ImGui.PopID();
-        return show_buttons;
+        ImGui.Separator();
+        if (ImGui.ArrowButton($"##Up.{ti.GetID()}", ImGuiDir.Up))
+        {
+            var temp = Sublist[i - 1];
+            Sublist.RemoveAt(i - 1);
+            Sublist.Insert(i, temp);
+        }
+        ImGui.SameLine();
+        if (ImGui.ArrowButton($"##Down.{ti.GetID()}", ImGuiDir.Down))
+        {
+            var temp = Sublist[i + 1];
+            Sublist.RemoveAt(i + 1);
+            Sublist.Insert(i, temp);
+        }
+        ImGui.Separator();
+        if (ImGui.Button($"Delete {ti.GetTitle()}"))
+        {
+            Sublist.RemoveAt(i);
+            ImGui.CloseCurrentPopup();
+        }
+    }
+    public override void RenderConfig()
+    {
+        foreach (var item in Sublist)
+        {
+            item.Config(GenericPopup);
+        }
     }
     public override void Render()
     {
-        if (AdvRadialMenu.Instance.BeginRadialMenu(Title))
+        if (AdvRadialMenu.Instance.BeginRadialMenu(GetTitle()))
         {
             foreach (var sh in Sublist)
             {
@@ -113,7 +97,25 @@ public class Menu : BaseItem
             AdvRadialMenu.Instance.EndRadialMenu();
         }
     }
-    public List<BaseItem> Sublist = new();
+    public override void ClearID()
+    {
+        SetID(string.Empty);
+        foreach (var itm in Sublist)
+        {
+            itm.ClearID();
+        }
+    }
+    public override void ResetID()
+    {
+        SetID(Guid.NewGuid().ToString());
+        foreach (var itm in Sublist)
+        {
+            itm.ResetID();
+        }
+    }
+    public List<IMenu> Sublist = new();
     [JsonIgnore]
-    private static Dictionary<Type, WheelTypeAttribute> Types = Registry.GetTypes<WheelTypeAttribute>().ToDictionary(x => x, y => y.GetCustomAttributes(typeof(WheelTypeAttribute), false).Select(x => x as WheelTypeAttribute).First())!;
+    private List<Type> types => Registry.GetTypes<IMenu>();
+    [JsonIgnore]
+    private List<string> item_names => types.Select(x => $"{x.GetCustomAttribute<DisplayNameAttribute>()?.Name ?? x.Name}").ToList();
 }

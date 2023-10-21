@@ -2,25 +2,41 @@ using System.Reflection;
 
 namespace Plugin.Attributes;
 
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-public class WheelTypeAttribute : Attribute
+public class HiddenAttribute : Attribute { }
+public class RenameAttribute : Attribute
 {
-    public bool Hide;
-    public string Name;
-    public WheelTypeAttribute(string name = "", bool Hidden = false)
+    public string OldName;
+    public RenameAttribute(string OldName)
     {
-        Name = name;
-        Hide = Hidden;
+        this.OldName = OldName;
+    }
+}
+public class DisplayNameAttribute : Attribute
+{
+    public string Name;
+    public DisplayNameAttribute(string Name)
+    {
+        this.Name = Name;
     }
 }
 public static class Registry
 {
-    public static List<Type> GetTypes<T>() where T : Attribute
+    public static List<Type> GetTypes<T>()
     {
-        return typeof(T).Assembly.GetTypes().Where(attr => attr.GetCustomAttributes<T>(false).ToArray().Length > 0).ToList();
+        return Assembly.GetCallingAssembly().GetExportedTypes().Where(x => x.GetInterfaces().Contains(typeof(T))).Where(x => x.IsClass && !x.IsInterface && !x.IsAbstract).ToList();
     }
-    public static List<T> GetAttributes<T>() where T : Attribute
+    public static Dictionary<string, string> TypeRenames()
     {
-        return GetTypes<T>().SelectMany(att => att.GetCustomAttributes<T>()).Select(at => (T)at).ToList();
+        var types = Assembly.GetCallingAssembly().GetExportedTypes().Where(x => x.GetCustomAttributes<RenameAttribute>().Count() > 0);
+        var ret = new Dictionary<string, string>();
+        foreach (var typ in types)
+        {
+            var attrs = typ.GetCustomAttributes<RenameAttribute>();
+            foreach (var atr in attrs)
+            {
+                ret.Add(typ.FullName!.Replace(typ.Name, atr.OldName), typ.FullName);
+            }
+        }
+        return ret;
     }
 }

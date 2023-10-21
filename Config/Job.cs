@@ -1,47 +1,37 @@
 using ImComponents;
 using ImGuiNET;
+
 using Newtonsoft.Json;
+
 using Lumina.Excel.GeneratedSheets;
 
 using Plugin;
 using Plugin.Services;
-using Plugin.Attributes;
-
+using Dalamud.Utility;
 
 namespace MZRadialMenu.Config;
 
-[WheelType("Job", false)]
 public class Job : BaseItem
 {
-    public override bool RenderConfig()
+    [JsonIgnore]
+    public int current_item;
+    public override void RenderConfig()
     {
-        ImGui.PushID(UUID);
-        if (ImGui.BeginCombo("Job / Class", Title))
-        {
-            foreach (var cjb in cljb.Where(x => x.Name != "adventurer").OrderBy(x => x.Role).ThenBy(x => x.ClassJobParent.Row).ThenBy(x => x.RowId))
-            {
-                if (ImGui.Selectable(cjb.NameEnglish.ToString()))
-                {
-                    Title = cjb.NameEnglish.ToString();
-                }
-                if (Title.Equals(cjb.NameEnglish.ToString()))
-                {
-                    ImGui.SetItemDefaultFocus();
-                }
-            }
-            ImGui.EndCombo();
-        }
-        ImGui.PopID();
-        return true;
+        current_item = cljb.FindIndex(x => x.NameEnglish.ToString() == Title);
+        ImGui.ListBox("Class / Job", ref current_item, cljb.Select(x => x.NameEnglish.ToString()).ToArray(), cljb.Count);
+        Title = cljb[current_item].NameEnglish.ToString();
+    }
+    public void Execute()
+    {
+        CmdService.Execute($"/gs change \"{cljb.Where(x => x.NameEnglish.ToString().Equals(Title)).First().NameEnglish}\"");
     }
     public override void Render()
     {
         if (AdvRadialMenu.Instance.RadialMenuItem(Title))
         {
-            DalamudApi.PluginLog.Debug($"{cljb.Where(x => x.NameEnglish.ToString().Equals(Title)).First().NameEnglish.ToString()}");
-            CmdService.Instance.ExecuteCommand($"/gs change \"{cljb.Where(x => x.NameEnglish.ToString().Equals(Title)).First().NameEnglish.ToString()}\"");
+            Execute();
         }
     }
     [JsonIgnore]
-    private static Lumina.Excel.ExcelSheet<ClassJob> cljb = DalamudApi.GameData.GetExcelSheet<ClassJob>()!;
+    private static List<ClassJob> cljb => DalamudApi.GameData.GetExcelSheet<ClassJob>()!.Where(x => !x.NameEnglish.ToString().Trim().IsNullOrWhitespace()).Where(x => x.Name != "adventurer").OrderBy(x => x.Role).ThenBy(x => x.ClassJobParent.Row).ThenBy(x => x.RowId).ToList();
 }

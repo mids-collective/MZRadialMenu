@@ -8,7 +8,14 @@ namespace Plugin.Services;
 public unsafe sealed class MacroService : IService<MacroService>
 {
     public static MacroService Instance => Service<MacroService>.Instance;
-    private const string macroSig = "E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8D 4D 28";
+    public static void Execute(int id) => Instance.ExecuteMacro(id);
+    public void ExecuteMacro(int id)
+    {
+        if (id is >= 0 and < 200)
+        {
+            ExecuteMacroHook!.Original(UIService.Instance.raptureShellModule, (nint)UIService.Instance.raptureMacroModule + 0x58 + (MacroStruct.size * id));
+        }
+    }
     // Macro Execution
     public delegate void ExecuteMacroDelegate(RaptureShellModule* raptureShellModule, nint macro);
     public Hook<ExecuteMacroDelegate>? ExecuteMacroHook;
@@ -33,18 +40,19 @@ public unsafe sealed class MacroService : IService<MacroService>
                 SafeMemory.WriteBytes(numExecutedMacroLinesPtr, new[] { value });
         }
     }
-    private MacroService() { 
-        ExecuteMacroHook = DalamudApi.GameInteropProvider.HookFromSignature<ExecuteMacroDelegate>(macroSig, ExecuteMacroDetour);
-        numCopiedMacroLinesPtr = DalamudApi.SigScanner.ScanText("49 8D 5E 70 BF ?? 00 00 00") + 0x5;
-        numExecutedMacroLinesPtr = DalamudApi.SigScanner.ScanText("41 83 F8 ?? 0F 8D ?? ?? ?? ?? 49 6B C8 68") + 0x3;
+    private MacroService()
+    {
+        ExecuteMacroHook = DalamudApi.GameInteropProvider.HookFromSignature<ExecuteMacroDelegate>(SigService.GetSig("Macro"), ExecuteMacroDetour);
+        numCopiedMacroLinesPtr = DalamudApi.SigScanner.ScanText(SigService.GetSig("CopiedMacroLines")) + 0x5;
+        numExecutedMacroLinesPtr = DalamudApi.SigScanner.ScanText(SigService.GetSig("ExecutedMacroLines")) + 0x3;
 
         ExecuteMacroHook!.Enable();
     }
 
     private void ExecuteMacroDetour(RaptureShellModule* raptureShellModule, nint macro)
     {
-        NumCopiedMacroLines = Macro.numLines;
-        NumExecutedMacroLines = Macro.numLines;
+        NumCopiedMacroLines = MacroStruct.numLines;
+        NumExecutedMacroLines = MacroStruct.numLines;
         ExecuteMacroHook!.Original(raptureShellModule, macro);
     }
     public void Dispose()

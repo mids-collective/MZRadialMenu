@@ -5,31 +5,31 @@ namespace Plugin.Services;
 public sealed class WheelService : IService<WheelService>
 {
     public static WheelService Instance => Service<WheelService>.Instance;
-    private ConfigFile Config;
+    private ConfigFile _config;
     private WheelService()
     {
+        _config = ConfigService.Config().DeepCopy();
         DalamudApi.PluginInterface.UiBuilder.Draw += Draw;
-        Config = ConfigService.Instance.GetConfig().DeepCopy();
     }
     public ConfigFile GetConfig()
     {
-        return Config;
+        return _config.DeepCopy();
     }
     public void SetConfig(ConfigFile config)
     {
-        Config = config.DeepCopy();
+        _config = config.DeepCopy();
     }
     private void Draw()
     {
         if (DalamudApi.ClientState.IsLoggedIn)
         {
-            for (int i = 0; i < Config!.WheelSet.Count; i++)
+            for (int i = 0; i < _config!.WheelSet.Count; i++)
             {
-                var Config = this.Config.WheelSet[i];
+                var Config = _config.WheelSet[i];
                 if (Config.key.key != 0x0)
                 {
                     var open = DalamudApi.Keys[Config.key.key];
-                    if (open && !this.Config.WheelSet.Any(x => x.IsOpen) && !UIService.Instance.IsGameTextInputActive)
+                    if (open && !this._config.WheelSet.Any(x => x.IsOpen) && !UIService.Instance.IsGameTextInputActive)
                     {
                         Config.IsOpen = true;
                         ImGui.OpenPopup("##Wheel", ImGuiPopupFlags.NoOpenOverExistingPopup);
