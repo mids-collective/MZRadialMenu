@@ -117,5 +117,5 @@ public class Menu : BaseItem
     [JsonIgnore]
     private List<Type> types => Registry.GetTypes<IMenu>();
     [JsonIgnore]
-    private List<string> item_names => types.Select(x => $"{x.GetCustomAttribute<DisplayNameAttribute>()?.Name ?? x.Name}").ToList();
+    private List<string> item_names => types.Where(x => x.GetCustomAttribute<HiddenAttribute>() == null).Select(x => $"{x.GetCustomAttribute<DisplayNameAttribute>()?.Name ?? x.Name}").ToList();
 }

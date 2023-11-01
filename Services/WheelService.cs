@@ -8,7 +8,7 @@ public sealed class WheelService : IService<WheelService>
     private ConfigFile _config;
     private WheelService()
     {
-        _config = ConfigService.Config().DeepCopy();
+        _config = ConfigService.Config();
         DalamudApi.PluginInterface.UiBuilder.Draw += Draw;
     }
     public ConfigFile GetConfig()

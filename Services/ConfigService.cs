@@ -25,7 +25,7 @@ public sealed class ConfigService : IService<ConfigService>
 
     private ConfigFile GetConfig()
     {
-        return _config;
+        return _config.DeepCopy();
     }
     private void ToggleConfig(string cmd, string args)
     {
@@ -73,6 +73,7 @@ public sealed class ConfigService : IService<ConfigService>
                 {
                     ConfigOpen = false;
                     WheelService.Instance.SetConfig(_config);
+                    DalamudApi.PluginInterface.SavePluginConfig(_config);
                 }
                 if (ImGui.MenuItem("Save"))
                 {
@@ -81,12 +82,12 @@ public sealed class ConfigService : IService<ConfigService>
                 }
                 if (ImGui.MenuItem("Revert"))
                 {
-                    _config = WheelService.Instance.GetConfig().DeepCopy();
+                    _config = WheelService.Instance.GetConfig();
                 }
                 if (ImGui.MenuItem("Close"))
                 {
                     ConfigOpen = false;
-                    _config = WheelService.Instance.GetConfig().DeepCopy();
+                    _config = WheelService.Instance.GetConfig();
                 }
                 ImGui.EndMenu();
             }
@@ -128,6 +129,7 @@ public sealed class ConfigService : IService<ConfigService>
 
     public void Dispose()
     {
+        DalamudApi.PluginInterface.SavePluginConfig(_config);
         DalamudApi.PluginInterface.UiBuilder.Draw -= Draw;
         DalamudApi.PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfig;
     }
