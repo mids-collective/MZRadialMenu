@@ -18,6 +18,10 @@ public class Job : BaseItem
     public override void RenderConfig()
     {
         current_item = cljb.FindIndex(x => x.NameEnglish.ToString() == Title);
+        if (current_item == -1)
+        {
+            current_item = 0;
+        }
         ImGui.ListBox("Class / Job", ref current_item, cljb.Select(x => x.NameEnglish.ToString()).ToArray(), cljb.Count);
         Title = cljb[current_item].NameEnglish.ToString();
     }
