@@ -15,7 +15,7 @@ public class Job : BaseItem
 {
     [JsonIgnore]
     public int current_item;
-    private Job() {
+    public Job() {
         Title = cljb.First().NameEnglish.ToString();
     }
     public override void RenderConfig()
