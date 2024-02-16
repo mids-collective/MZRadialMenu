@@ -10,11 +10,14 @@ public unsafe sealed class ItemService : IService<ItemService>
     private const int aetherCompassID = 2001886;
     private delegate void UseItemDelegate(nint agent, uint cnt, uint itm, uint unk1, short unk2);
     private UseItemDelegate useItem;
+    private delegate uint GetActionID(uint a, uint b);
+    private GetActionID getActionID;
     private Dictionary<uint, string> usables = new();
     private nint itemContextMenuAgent;
     private ItemService()
     {
         useItem = Marshal.GetDelegateForFunctionPointer<UseItemDelegate>(DalamudApi.SigScanner.ScanText(SigService.GetSig("UseItem")));
+        getActionID = Marshal.GetDelegateForFunctionPointer<GetActionID>(DalamudApi.SigScanner.ScanText(SigService.GetSig("GetActionID")));
         InitUsables();
     }
 
@@ -24,7 +27,7 @@ public unsafe sealed class ItemService : IService<ItemService>
         if (string.IsNullOrWhiteSpace(name)) return;
 
         var newName = name.Replace("\uE03C", ""); // Remove HQ Symbol
-        var useHQ = newName != name;
+        var useHQ = !newName.Equals(name);
         newName = newName.ToLower().Trim(' ');
 
         UseItem(usables.First(i => i.Value == newName).Key + (uint)(useHQ ? 1_000_000 : 0));
@@ -44,6 +47,7 @@ public unsafe sealed class ItemService : IService<ItemService>
         }
         else
         {
+            id = getActionID(2, id);
             useItem(itemContextMenuAgent, id, 9999, 0, 0);
         }
     }
