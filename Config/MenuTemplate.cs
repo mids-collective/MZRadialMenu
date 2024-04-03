@@ -68,6 +68,9 @@ public class MenuTemplate : BaseItem
             {
                 templates.RemoveAt(i);
             }
+            if(ImGui.IsItemHovered()) {
+                ImGui.SetTooltip("Delete this template");
+            }
         }
     }
     public void GenericPopup(IMenu ti)
