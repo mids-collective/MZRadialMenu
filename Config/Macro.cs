@@ -1,19 +1,17 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
-
 using ImComponents;
 using ImGuiNET;
-
-using Plugin.Structures;
-using Plugin.Services;
 using Plugin.Attributes;
+using Plugin.Services;
+using Plugin.Structures;
 
 namespace MZRadialMenu.Config;
 
 //Virtual macros?
 //Need to limit text output macros
 [Rename("MacroShortcut")]
-public class Macro : BaseItem
+public class Macro : BaseItem, ITemplatable
 {
     public override void RenderConfig()
     {
@@ -42,5 +40,29 @@ public class Macro : BaseItem
             Execute();
         }
     }
-    public List<string> Commands = new();
+
+    public void RenderTemplate(TemplateObject reps)
+    {
+        if (AdvRadialMenu.Instance.RadialMenuItem(Title))
+        {
+            ExecuteTemplate(reps.repl);
+        }
+    }
+
+    public unsafe void ExecuteTemplate(string reps)
+    {
+        var lst = Commands.ToArray().ToList();
+        lst.ForEach(x =>  x = x.Replace($"<tmpl>", reps));
+        var macroPtr = Marshal.AllocHGlobal(ExtendedMacro.size);
+        using var ExMacro = new ExtendedMacro(macroPtr, string.Empty, lst);
+        Marshal.StructureToPtr(ExMacro, macroPtr, false);
+        var commandCount = (byte)Math.Max(MacroStruct.numLines, lst.Count);
+        MacroService.Instance.NumCopiedMacroLines = commandCount;
+        MacroService.Instance.NumExecutedMacroLines = commandCount;
+        MacroService.Instance.ExecuteMacroHook!.Original(UIService.Instance.raptureShellModule, macroPtr);
+        MacroService.Instance.NumCopiedMacroLines = MacroStruct.numLines;
+        Marshal.FreeHGlobal(macroPtr);
+    }
+
+    public List<string> Commands = [];
 }

@@ -8,9 +8,10 @@ using Plugin.Attributes;
 
 namespace MZRadialMenu.Config;
 
-public partial class Menu : BaseItem, ITemplatable
+[DisplayName("Template Menu")]
+public class MenuTemplate : BaseItem
 {
-    public Menu() : base()
+    public MenuTemplate() : base()
     {
         RegisterCallback(MenuPopup);
         RegisterCallback(AddItemPopup);
@@ -23,7 +24,7 @@ public partial class Menu : BaseItem, ITemplatable
         if (ImGui.Button("Add Item"))
         {
             var item = Activator.CreateInstance(Types[current_item]);
-            Sublist.Add((item as IMenu)!);
+            Sublist.Add((item as ITemplatable)!);
         }
     }
     public void MenuPopup(IMenu ti)
@@ -36,12 +37,36 @@ public partial class Menu : BaseItem, ITemplatable
             foreach (var match in matches)
             {
                 var import = match.Groups["import"].Value;
-                var obj = JsonConvert.DeserializeObject<IMenu>(Encoding.UTF8.GetString(Convert.FromBase64String(import)));
+                var obj = JsonConvert.DeserializeObject<ITemplatable>(Encoding.UTF8.GetString(Convert.FromBase64String(import)));
                 if (obj != null)
                 {
                     obj.ResetID();
                     Sublist.Add(obj);
                 }
+            }
+        }
+        if (ImGui.Button($"+ Template##{GetID()}"))
+        {
+            templates.Add(new TemplateObject());
+        }
+        for (int i = 0; i < templates.Count; i++)
+        {
+            var temp = templates[i];
+            ImGui.InputText($"##{templates[i].guid}", ref temp.name, 0x20);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Name of the template");
+            }
+            ImGui.SameLine();
+            ImGui.InputText($"##{templates[i].guid}", ref temp.repl, 0x20);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Replaces <tmpl> in any following executing lines (Macros/Shortcuts/etc)");
+            }
+            ImGui.SameLine();
+            if (ImGui.Button($"X##{templates[i].guid}"))
+            {
+                templates.RemoveAt(i);
             }
         }
     }
@@ -88,9 +113,16 @@ public partial class Menu : BaseItem, ITemplatable
     {
         if (AdvRadialMenu.Instance.BeginRadialMenu(GetTitle()))
         {
-            foreach (var sh in Sublist)
+            foreach (var temp in templates)
             {
-                sh.Render();
+                if (AdvRadialMenu.Instance.BeginRadialMenu(temp.name))
+                {
+                    foreach (var sh in Sublist)
+                    {
+                        sh.RenderTemplate(temp);
+                    }
+                    AdvRadialMenu.Instance.EndRadialMenu();
+                }
             }
             AdvRadialMenu.Instance.EndRadialMenu();
         }
@@ -111,15 +143,10 @@ public partial class Menu : BaseItem, ITemplatable
             itm.ResetID();
         }
     }
-
-    public void RenderTemplate(TemplateObject rep)
-    {
-        Render();
-    }
-
-    public List<IMenu> Sublist = [];
+    public List<TemplateObject> templates = [];
+    public List<ITemplatable> Sublist = [];
     [JsonIgnore]
-    private static List<Type> Types => Registry.GetTypes<IMenu>();
+    private static List<Type> Types => Registry.GetTypes<ITemplatable>();
     [JsonIgnore]
     private static List<string> ItemNames => Types.Where(x => x.GetCustomAttribute<HiddenAttribute>() == null).Select(x => $"{x.GetCustomAttribute<DisplayNameAttribute>()?.Name ?? x.Name}").ToList();
 }

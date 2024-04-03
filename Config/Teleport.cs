@@ -74,5 +74,5 @@ public class Teleport : BaseItem
     public uint TelepoID = 0;
     public byte TelepoSubID = 0;
     [JsonIgnore]
-    private static Lumina.Excel.ExcelSheet<Aetheryte> Aetherytes = DalamudApi.GameData.GetExcelSheet<Aetheryte>(DalamudApi.ClientState.ClientLanguage)!;
+    private static readonly Lumina.Excel.ExcelSheet<Aetheryte> Aetherytes = DalamudApi.GameData.GetExcelSheet<Aetheryte>(DalamudApi.ClientState.ClientLanguage)!;
 }

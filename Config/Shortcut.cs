@@ -4,7 +4,7 @@ using ImComponents;
 using Plugin.Services;
 
 namespace MZRadialMenu.Config;
-public class Shortcut : BaseItem
+public class Shortcut : BaseItem, ITemplatable
 {
     public override void RenderConfig()
     {
@@ -22,5 +22,20 @@ public class Shortcut : BaseItem
             Execute();
         }
     }
+
+    public void RenderTemplate(TemplateObject reps)
+    {
+        if(AdvRadialMenu.Instance.RadialMenuItem(Title)) {
+            ExecuteTemplate(reps.repl);
+        }
+    }
+
+    public void ExecuteTemplate(string reps)
+    {
+        var cmd = Command.Clone().ToString()!;
+        cmd = cmd.Replace($"<tmpl>", $"{reps}");
+        CmdService.Execute(cmd);
+    }
+
     public string Command = string.Empty;
 }

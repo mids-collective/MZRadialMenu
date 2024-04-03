@@ -25,9 +25,15 @@ public interface IMenu
     public void ResetID();
 }
 
+[JsonConverter(typeof(Converter<ITemplatable>))]
+public interface ITemplatable : IMenu
+{
+    public void RenderTemplate(TemplateObject rep);
+}
+
 public abstract class BaseItem : IMenu
 {
-    private List<PopupCallback> _callbacks = new();
+    private List<PopupCallback> _callbacks = [];
     public void RegisterCallback(PopupCallback cb) => _callbacks.Add(cb);
     public bool RemoveCallback(PopupCallback cb) => _callbacks.Remove(cb);
     public abstract void Render();
@@ -105,13 +111,19 @@ public class Converter<T> : JsonConverter
     {
         var jsonObj = JObject.Load(reader);
         var ti = jsonObj["Type"]!.Value<string>()!;
-        if (Renames.ContainsKey(ti))
+        if (Renames.TryGetValue(ti, out string? value))
         {
-            ti = Renames[ti];
+            ti = value;
         }
         jsonObj.Remove("Type");
         var obj = Activator.CreateInstance(Conversions.Where(x => x.Name == ti || x.FullName == ti).First());
         serializer.Populate(jsonObj.CreateReader(), obj!);
         return obj ?? new Menu();
     }
+}
+
+public class TemplateObject {
+    public string name = string.Empty;
+    public string repl = string.Empty;
+    public string guid = Guid.NewGuid().ToString();
 }
