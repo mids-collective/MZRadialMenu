@@ -11,7 +11,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -32,6 +31,5 @@
   <ItemGroup>
     <Compile Remove="lib/**" />
     <ProjectReference Include="lib\ImComponents\ImComponents.csproj" />
-
   </ItemGroup>
 </Project>

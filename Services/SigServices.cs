@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using Newtonsoft.Json;
 
@@ -15,15 +17,13 @@ public sealed class SigService : IService<SigService>
     private SigService()
     {
         var thisAssembly = Assembly.GetExecutingAssembly();
-        using (var stream = thisAssembly.GetManifestResourceStream($"{thisAssembly.GetName().Name}.sigs.json"))
-        {
-            if (stream != null)
-                using (var reader = new StreamReader(stream))
-                {
-                    if (reader != null)
-                        Signatures = JsonConvert.DeserializeObject<Dictionary<string, string>>(reader.ReadToEnd()) ?? new();
-                }
-        }
+        using var stream = thisAssembly.GetManifestResourceStream($"{thisAssembly.GetName().Name}.sigs.json");
+        if (stream != null)
+            using (var reader = new StreamReader(stream))
+            {
+                if (reader != null)
+                    Signatures = JsonConvert.DeserializeObject<Dictionary<string, string>>(reader.ReadToEnd()) ?? new();
+            }
     }
     public void Dispose()
     {

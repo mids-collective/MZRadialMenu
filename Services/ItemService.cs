@@ -1,4 +1,5 @@
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
@@ -38,6 +39,7 @@ public unsafe sealed class ItemService : IService<ItemService>
         {
             ActionManager.Instance()->UseAction(ActionType.Action, 26988);
         }
+        // Wonderous Tales
         else if (id == usables.First(x => x.Value == "wondrous tails").Key)
         {
             ActionManager.Instance()->UseAction(ActionType.KeyItem, id);

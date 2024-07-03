@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using Newtonsoft.Json;
 
@@ -14,9 +16,9 @@ public sealed class Localization : IService<Localization>
         {
             return Locale[$"{DalamudApi.PluginInterface.UiLanguage}_{Glob}"];
         }
-        else if (Locale.ContainsKey(Glob))
+        else if (Locale.TryGetValue(Glob, out string? value))
         {
-            return Locale[Glob];
+            return value;
         }
         else
         {
@@ -26,15 +28,13 @@ public sealed class Localization : IService<Localization>
     private Localization()
     {
         var thisAssembly = Assembly.GetExecutingAssembly();
-        using (var stream = thisAssembly.GetManifestResourceStream($"{thisAssembly.GetName().Name}.locale.json"))
-        {
-            if (stream != null)
-                using (var reader = new StreamReader(stream))
-                {
-                    if (reader != null)
-                        Locale = JsonConvert.DeserializeObject<Dictionary<string, string>>(reader.ReadToEnd()) ?? new();
-                }
-        }
+        using var stream = thisAssembly.GetManifestResourceStream($"{thisAssembly.GetName().Name}.locale.json");
+        if (stream != null)
+            using (var reader = new StreamReader(stream))
+            {
+                if (reader != null)
+                    Locale = JsonConvert.DeserializeObject<Dictionary<string, string>>(reader.ReadToEnd()) ?? new();
+            }
     }
     public void Dispose()
     {

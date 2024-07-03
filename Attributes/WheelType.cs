@@ -1,23 +1,23 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Plugin.Attributes;
 
+[AttributeUsage(AttributeTargets.Class)]
 public class HiddenAttribute : Attribute { }
-public class RenameAttribute : Attribute
+
+[AttributeUsage(AttributeTargets.Class)]
+public class RenameAttribute(string OldName) : Attribute
 {
-    public string OldName;
-    public RenameAttribute(string OldName)
-    {
-        this.OldName = OldName;
-    }
+    public string OldName = OldName;
 }
-public class DisplayNameAttribute : Attribute
+
+[AttributeUsage(AttributeTargets.Class)]
+public class DisplayNameAttribute(string Name) : Attribute
 {
-    public string Name;
-    public DisplayNameAttribute(string Name)
-    {
-        this.Name = Name;
-    }
+    public string Name = Name;
 }
 public static class Registry
 {
@@ -27,7 +27,7 @@ public static class Registry
     }
     public static Dictionary<string, string> TypeRenames()
     {
-        var types = Assembly.GetCallingAssembly().GetExportedTypes().Where(x => x.GetCustomAttributes<RenameAttribute>().Count() > 0);
+        var types = Assembly.GetCallingAssembly().GetExportedTypes().Where(x => x.GetCustomAttributes<RenameAttribute>().Any());
         var ret = new Dictionary<string, string>();
         foreach (var typ in types)
         {
