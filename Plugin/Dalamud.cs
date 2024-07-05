@@ -6,10 +6,10 @@ using Dalamud.Plugin.Services;
 namespace Plugin;
 public class DalamudApi
 {
-    public static void Initialize(DalamudPluginInterface pluginInterface)
+    public static void Initialize(IDalamudPluginInterface pluginInterface)
         => pluginInterface.Create<DalamudApi>();
 
-    [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+    [PluginService] public static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] public static IDataManager GameData { get; private set; } = null!;
     [PluginService] public static IAetheryteList AetheryteList { get; private set; } = null!;
     [PluginService] public static IGameInteropProvider GameInteropProvider { get; private set; } = null!;

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using ImComponents;
@@ -49,7 +52,7 @@ public class MenuTemplate : BaseItem
         {
             templates.Add(new TemplateObject());
         }
-        for (int i = 0; i < templates.Count; i++)
+        for (int i = 0; i < templates.Count(); i++)
         {
             var temp = templates[i];
             ImGui.InputText($"##{templates[i].guid}", ref temp.name, 0x20);

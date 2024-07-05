@@ -9,6 +9,7 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 using Plugin;
+using System.Linq;
 
 namespace MZRadialMenu.Config;
 
@@ -53,7 +54,7 @@ public class Teleport : BaseItem
                 {
                     TelepoID = itm.AetheryteId;
                     TelepoSubID = itm.SubIndex;
-                    IsHouse = itm.IsSharedHouse || itm.IsAppartment || itm.Ward != 0 || itm.Plot != 0;
+                    IsHouse = itm.IsSharedHouse || itm.IsApartment || itm.Ward != 0 || itm.Plot != 0;
                 }
                 if (itm.AetheryteId == TelepoID && itm.SubIndex == TelepoSubID)
                 {

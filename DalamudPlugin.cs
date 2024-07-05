@@ -7,7 +7,7 @@ namespace MZRadialMenu;
 public class MZRadialMenu : IDalamudPlugin
 {
     private ServiceInitializer initializer;
-    public MZRadialMenu(DalamudPluginInterface dpi)
+    public MZRadialMenu(IDalamudPluginInterface dpi)
     {
         DalamudApi.Initialize(dpi);
         initializer = new ServiceInitializer();

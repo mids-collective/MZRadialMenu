@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using ImComponents;
@@ -26,7 +29,7 @@ public class Macro : BaseItem, ITemplatable
         var macroPtr = Marshal.AllocHGlobal(ExtendedMacro.size);
         using var ExMacro = new ExtendedMacro(macroPtr, string.Empty, Commands);
         Marshal.StructureToPtr(ExMacro, macroPtr, false);
-        var commandCount = (byte)Math.Max(MacroStruct.numLines, Commands.Count);
+        var commandCount = (byte)Math.Max(MacroStruct.numLines, Commands.Count());
         MacroService.Instance.NumCopiedMacroLines = commandCount;
         MacroService.Instance.NumExecutedMacroLines = commandCount;
         MacroService.Instance.ExecuteMacroHook!.Original(UIService.Instance.raptureShellModule, macroPtr);
@@ -56,7 +59,7 @@ public class Macro : BaseItem, ITemplatable
         var macroPtr = Marshal.AllocHGlobal(ExtendedMacro.size);
         using var ExMacro = new ExtendedMacro(macroPtr, string.Empty, lst);
         Marshal.StructureToPtr(ExMacro, macroPtr, false);
-        var commandCount = (byte)Math.Max(MacroStruct.numLines, lst.Count);
+        var commandCount = (byte)Math.Max(MacroStruct.numLines, lst.Count());
         MacroService.Instance.NumCopiedMacroLines = commandCount;
         MacroService.Instance.NumExecutedMacroLines = commandCount;
         MacroService.Instance.ExecuteMacroHook!.Original(UIService.Instance.raptureShellModule, macroPtr);

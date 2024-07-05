@@ -8,6 +8,8 @@ using Lumina.Excel.GeneratedSheets;
 using Plugin;
 using Plugin.Services;
 using Dalamud.Utility;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MZRadialMenu.Config;
 
