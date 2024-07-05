@@ -9,12 +9,9 @@ public unsafe sealed class ItemService : IService<ItemService>
 {
     public static ItemService Instance => Service<ItemService>.Instance;
     private const int aetherCompassID = 2001886;
-    private static delegate* unmanaged<nint, uint, uint, uint, short, void> useItem;
     private Dictionary<uint, string> usables = new();
-    private nint itemContextMenuAgent;
     private ItemService()
     {
-        useItem = (delegate* unmanaged<nint, uint, uint, uint, short, void>)DalamudApi.SigScanner.ScanText(SigService.GetSig("UseItem"));
         usables.Clear();
         InitUsables();
     }
@@ -46,7 +43,7 @@ public unsafe sealed class ItemService : IService<ItemService>
         }
         else
         {
-            useItem(itemContextMenuAgent, id, 9999, 0, 0);
+            UIService.Instance.agentInventoryContext->UseItem(id);
         }
     }
 
@@ -56,7 +53,6 @@ public unsafe sealed class ItemService : IService<ItemService>
             .Concat(DalamudApi.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
             .ToDictionary(kv => kv.Key, kv => kv.Value);
         usables[aetherCompassID] = "aether compass";
-        itemContextMenuAgent = UIService.Instance.GetAgentByInternalID(AgentId.InventoryContext);
     }
     public void Dispose()
     {
