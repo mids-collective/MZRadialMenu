@@ -9,7 +9,7 @@ namespace Plugin.Services;
 public unsafe sealed class UIService : IService<UIService>
 {
     public static UIService Instance => Service<UIService>.Instance;
-    private UIModule* uiModule => Framework.Instance()->GetUIModule();
+    public UIModule* uiModule => Framework.Instance()->GetUIModule();
     public RaptureShellModule* raptureShellModule => uiModule->GetRaptureShellModule();
     public RaptureMacroModule* raptureMacroModule => uiModule->GetRaptureMacroModule();
     private AgentModule* agentModule => uiModule->GetAgentModule();
