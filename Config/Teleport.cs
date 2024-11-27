@@ -1,8 +1,6 @@
 using ImGuiNET;
 using ImComponents;
 
-using Lumina.Excel.GeneratedSheets;
-
 using Newtonsoft.Json;
 
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -10,6 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 using Plugin;
 using System.Linq;
+using Lumina.Excel.Sheets;
 
 namespace MZRadialMenu.Config;
 
@@ -26,7 +25,7 @@ public class Teleport : BaseItem
         {
             return;
         }
-        if (DalamudApi.ClientState.LocalPlayer.HomeWorld.Id != DalamudApi.ClientState.LocalPlayer.CurrentWorld.Id && IsHouse)
+        if (DalamudApi.ClientState.LocalPlayer.HomeWorld.RowId != DalamudApi.ClientState.LocalPlayer.CurrentWorld.RowId && IsHouse)
         {
             DalamudApi.Chat.PrintError($"Cannot teleport to housing while using visiting other worlds!");
         }
@@ -37,18 +36,18 @@ public class Teleport : BaseItem
         ImGui.InputText("Title", ref Title, 0xF);
         if (
             ImGui.BeginCombo(
-                "Teleport", DalamudApi.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(TelepoID)!.PlaceName.Value?.Name.ToString()!)
+                "Teleport", DalamudApi.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(TelepoID)!.PlaceName.Value.ToString()!)
             )
         )
         {
             foreach (var itm in DalamudApi.AetheryteList
-                .OrderBy(x => Aetherytes.GetRow(x.AetheryteData.GameData!.RowId)!.Territory.Value!.PlaceNameRegion.Row)
-                .ThenBy(x => Aetherytes.GetRow(x.AetheryteData.GameData!.RowId)!.PlaceName.Row)
+                .OrderBy(x => Aetherytes.GetRow(x.AetheryteData.RowId)!.Territory.Value!.PlaceNameRegion.RowId)
+                .ThenBy(x => Aetherytes.GetRow(x.AetheryteData.RowId)!.PlaceName.RowId)
             )
             {
                 if (
                     ImGui.Selectable(
-                        DalamudApi.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(itm.AetheryteData.GameData!.RowId)!.PlaceName.Value?.Name.ToString()!)
+                        DalamudApi.PluginInterface.Sanitizer.Sanitize(Aetherytes.GetRow(itm.AetheryteData.RowId)!.PlaceName.Value.ToString()!)
                     )
                 )
                 {

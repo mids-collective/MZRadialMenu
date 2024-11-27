@@ -3,13 +3,12 @@ using ImGuiNET;
 
 using Newtonsoft.Json;
 
-using Lumina.Excel.GeneratedSheets;
-
 using Plugin;
 using Plugin.Services;
 using Dalamud.Utility;
 using System.Collections.Generic;
 using System.Linq;
+using Lumina.Excel.Sheets;
 
 namespace MZRadialMenu.Config;
 
@@ -38,5 +37,5 @@ public class Job : BaseItem
         }
     }
     [JsonIgnore]
-    private static List<ClassJob> cljb => DalamudApi.GameData.GetExcelSheet<ClassJob>()!.Where(x => !x.NameEnglish.ToString().Trim().IsNullOrWhitespace()).Where(x => x.Name != "adventurer").OrderBy(x => x.Role).ThenBy(x => x.ClassJobParent.Row).ThenBy(x => x.RowId).ToList();
+    private static List<ClassJob> cljb => DalamudApi.GameData.GetExcelSheet<ClassJob>()!.Where(x => !x.NameEnglish.ToString().Trim().IsNullOrWhitespace()).Where(x => x.Name != "adventurer").OrderBy(x => x.Role).ThenBy(x => x.ClassJobParent.RowId).ThenBy(x => x.RowId).ToList();
 }

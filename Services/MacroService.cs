@@ -9,11 +9,17 @@ public unsafe sealed class MacroService : IService<MacroService>
 {
     public static MacroService Instance => Service<MacroService>.Instance;
     public static void Execute(int id) => Instance.ExecuteMacro(id);
-    public void ExecuteMacro(int id)
+    public void ExecuteMacro(int macro)
     {
-        if (id is >= 0 and < 200)
+        if (macro < 100)
         {
-            ExecuteMacroHook!.Original(UIService.Instance.raptureShellModule, (nint)UIService.Instance.raptureMacroModule + 0x58 + (MacroStruct.size * id));
+            fixed (void* ptr = &UIService.Instance.raptureMacroModule->Individual[macro])
+                ExecuteMacroHook!.Original(UIService.Instance.raptureShellModule, (nint)ptr);
+        }
+        else
+        {
+            fixed (void* ptr = &UIService.Instance.raptureMacroModule->Shared[macro - 100])
+                ExecuteMacroHook!.Original(UIService.Instance.raptureShellModule, (nint)ptr);
         }
     }
     // Macro Execution
@@ -45,7 +51,6 @@ public unsafe sealed class MacroService : IService<MacroService>
         ExecuteMacroHook = DalamudApi.GameInteropProvider.HookFromSignature<ExecuteMacroDelegate>(SigService.GetSig("Macro"), ExecuteMacroDetour);
         numCopiedMacroLinesPtr = DalamudApi.SigScanner.ScanText(SigService.GetSig("CopiedMacroLines")) + 0x5;
         numExecutedMacroLinesPtr = DalamudApi.SigScanner.ScanText(SigService.GetSig("ExecutedMacroLines")) + 0x3;
-
         ExecuteMacroHook!.Enable();
     }
 

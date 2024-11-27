@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+
 
 namespace Plugin.Services;
 
@@ -49,8 +49,8 @@ public unsafe sealed class ItemService : IService<ItemService>
 
     private void InitUsables()
     {
-        usables = DalamudApi.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.Item>()!.Where(i => i.ItemAction.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
-            .Concat(DalamudApi.GameData.GetExcelSheet<Lumina.Excel.GeneratedSheets.EventItem>()!.Where(i => i.Action.Row > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
+        usables = DalamudApi.GameData.GetExcelSheet<Lumina.Excel.Sheets.Item>()!.Where(i => i.ItemAction.RowId > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower())
+            .Concat(DalamudApi.GameData.GetExcelSheet<Lumina.Excel.Sheets.EventItem>()!.Where(i => i.Action.RowId > 0).ToDictionary(i => i.RowId, i => i.Name.ToString().ToLower()))
             .ToDictionary(kv => kv.Key, kv => kv.Value);
         usables[aetherCompassID] = "aether compass";
     }
