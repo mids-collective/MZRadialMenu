@@ -6,6 +6,7 @@
   "InternalName": "MZRadialMenu",
   "ApplicableVersion": "any",
   "DalamudApiLevel": 10,
+  "TestingDalamudApiLevel": 11,
   "Tags": [
     "UI"
   ],
