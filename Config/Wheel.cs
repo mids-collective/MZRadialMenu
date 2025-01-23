@@ -16,7 +16,7 @@ public class Wheel : Menu
     {
         RegisterCallback(WheelPopup);
     }
-    private void WheelPopup(IMenu item)
+    private void WheelPopup(IBaseItem item)
     {
         key.Render();
         if (ImGui.Button($"Export Wheel##{item.GetID()}"))
@@ -29,7 +29,7 @@ public class Wheel : Menu
             ImGui.SetClipboardText(exp);
         }
     }
-    public override void Render(ImComponents.Raii.IMenu im)
+    public override void Render(IMenu im)
     {
         foreach (var itm in Sublist)
         {

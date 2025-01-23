@@ -20,7 +20,7 @@ public class MenuTemplate : BaseItem
         RegisterCallback(AddItemPopup);
     }
     private int current_item;
-    public void AddItemPopup(IMenu ti)
+    public void AddItemPopup(IBaseItem ti)
     {
         ImGui.Text("Item to add");
         ImGui.ListBox($"##{ti.GetID()}", ref current_item, [.. ItemNames], ItemNames.Count);
@@ -30,7 +30,7 @@ public class MenuTemplate : BaseItem
             Sublist.Add((item as ITemplatable)!);
         }
     }
-    public void MenuPopup(IMenu ti)
+    public void MenuPopup(IBaseItem ti)
     {
         ImGui.InputText($"Title##{ti.GetID()}", ref Title, 0xF);
         if (ImGui.Button($"Import from clipboard##{ti.GetID()}"))
@@ -77,7 +77,7 @@ public class MenuTemplate : BaseItem
             }
         }
     }
-    public void GenericPopup(IMenu ti)
+    public void GenericPopup(IBaseItem ti)
     {
         var i = Sublist.FindIndex(x => x.GetID() == ti.GetID());
         if (ImGui.Button($"Export to clipboard##{ti.GetID()}"))
@@ -116,7 +116,7 @@ public class MenuTemplate : BaseItem
             item.Config(GenericPopup);
         }
     }
-    public override void Render(ImComponents.Raii.IMenu im)
+    public override void Render(IMenu im)
     {
         using var temp1 = im.Menu(this.Title);
         if (temp1.open)

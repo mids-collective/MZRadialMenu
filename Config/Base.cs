@@ -6,13 +6,14 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Plugin.Attributes;
+using ImComponents.Raii;
 
 namespace MZRadialMenu.Config;
 
-public delegate void PopupCallback(IMenu obj);
+public delegate void PopupCallback(IBaseItem obj);
 
-[JsonConverter(typeof(Converter<IMenu>))]
-public interface IMenu
+[JsonConverter(typeof(Converter<IBaseItem>))]
+public interface IBaseItem
 {
     public void RegisterCallback(PopupCallback cb);
     public bool RemoveCallback(PopupCallback cb);
@@ -29,17 +30,17 @@ public interface IMenu
 }
 
 [JsonConverter(typeof(Converter<ITemplatable>))]
-public interface ITemplatable : IMenu
+public interface ITemplatable : IBaseItem
 {
-    public void RenderTemplate(TemplateObject rep, ImComponents.Raii.IMenu rai);
+    public void RenderTemplate(TemplateObject rep, IMenu rai);
 }
 
-public abstract class BaseItem : IMenu
+public abstract class BaseItem : IBaseItem
 {
     private List<PopupCallback> _callbacks = [];
     public void RegisterCallback(PopupCallback cb) => _callbacks.Add(cb);
     public bool RemoveCallback(PopupCallback cb) => _callbacks.Remove(cb);
-    public abstract void Render(ImComponents.Raii.IMenu rai);
+    public abstract void Render(IMenu rai);
     public abstract void RenderConfig();
     public void Config(PopupCallback? CustomCallback = null)
     {

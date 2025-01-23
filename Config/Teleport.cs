@@ -1,5 +1,5 @@
 using ImGuiNET;
-using ImComponents;
+using ImComponents.Raii;
 
 using Newtonsoft.Json;
 
@@ -63,7 +63,7 @@ public class Teleport : BaseItem
             ImGui.EndCombo();
         }
     }
-    public override void Render(ImComponents.Raii.IMenu im)
+    public override void Render(IMenu im)
     {
         if (im.RadialMenuItem(Title))
         {
