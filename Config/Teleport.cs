@@ -63,9 +63,9 @@ public class Teleport : BaseItem
             ImGui.EndCombo();
         }
     }
-    public override void Render()
+    public override void Render(ImComponents.Raii.IMenu im)
     {
-        if (RadialMenu.Instance.RadialMenuItem(Title))
+        if (im.RadialMenuItem(Title))
         {
             Execute();
         }

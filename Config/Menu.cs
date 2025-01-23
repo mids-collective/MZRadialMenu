@@ -88,14 +88,14 @@ public partial class Menu : BaseItem, ITemplatable
             item.Config(GenericPopup);
         }
     }
-    public override void Render()
+    public override void Render(ImComponents.Raii.IMenu im)
     {
-        using var raii = new SubMenu(Title);
+        using var raii = im.Menu(Title);
         if (raii.open)
         {
             foreach (var sh in Sublist)
             {
-                sh.Render();
+                sh.Render(raii);
             }
         }
     }
@@ -116,9 +116,9 @@ public partial class Menu : BaseItem, ITemplatable
         }
     }
 
-    public void RenderTemplate(TemplateObject rep)
+    public void RenderTemplate(TemplateObject rep, ImComponents.Raii.IMenu im)
     {
-        Render();
+        Render(im);
     }
 
     public List<IMenu> Sublist = [];

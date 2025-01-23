@@ -116,9 +116,9 @@ public class MenuTemplate : BaseItem
             item.Config(GenericPopup);
         }
     }
-    public override void Render()
+    public override void Render(ImComponents.Raii.IMenu im)
     {
-        using var temp1 = new SubMenu(this.Title);
+        using var temp1 = im.Menu(this.Title);
         if (temp1.open)
         {
             foreach (var temp in templates)
@@ -128,7 +128,7 @@ public class MenuTemplate : BaseItem
                 {
                     foreach (var sh in Sublist)
                     {
-                        sh.RenderTemplate(temp);
+                        sh.RenderTemplate(temp, tmp2);
                     }
                 }
             }

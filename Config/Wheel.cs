@@ -29,11 +29,11 @@ public class Wheel : Menu
             ImGui.SetClipboardText(exp);
         }
     }
-    public override void Render()
+    public override void Render(ImComponents.Raii.IMenu im)
     {
         foreach (var itm in Sublist)
         {
-            itm.Render();
+            itm.Render(im);
         }
     }
     public void Render(bool open)
@@ -42,7 +42,7 @@ public class Wheel : Menu
         {
             using var rm = new RadialMenu(open);
             if(rm.open)
-                Render();
+                Render(rm);
         }
     }
     public HotkeyButton key = new();

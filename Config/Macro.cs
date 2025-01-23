@@ -36,17 +36,17 @@ public class Macro : BaseItem, ITemplatable
         MacroService.Instance.NumCopiedMacroLines = MacroStruct.numLines;
         Marshal.FreeHGlobal(macroPtr);
     }
-    public override void Render()
+    public override void Render(ImComponents.Raii.IMenu im)
     {
-        if (RadialMenu.Instance.RadialMenuItem(Title))
+        if (im.RadialMenuItem(Title))
         {
             Execute();
         }
     }
 
-    public void RenderTemplate(TemplateObject reps)
+    public void RenderTemplate(TemplateObject reps, ImComponents.Raii.IMenu im)
     {
-        if (RadialMenu.Instance.RadialMenuItem(Title))
+        if (im.RadialMenuItem(Title))
         {
             ExecuteTemplate(reps.repl);
         }

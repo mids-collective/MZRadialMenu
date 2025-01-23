@@ -16,7 +16,7 @@ public interface IMenu
 {
     public void RegisterCallback(PopupCallback cb);
     public bool RemoveCallback(PopupCallback cb);
-    public void Render();
+    public void Render(ImComponents.Raii.IMenu rai);
     public void RenderConfig();
     public void Config(PopupCallback? CustomCallback = null);
     public string GetID();
@@ -31,7 +31,7 @@ public interface IMenu
 [JsonConverter(typeof(Converter<ITemplatable>))]
 public interface ITemplatable : IMenu
 {
-    public void RenderTemplate(TemplateObject rep);
+    public void RenderTemplate(TemplateObject rep, ImComponents.Raii.IMenu rai);
 }
 
 public abstract class BaseItem : IMenu
@@ -39,7 +39,7 @@ public abstract class BaseItem : IMenu
     private List<PopupCallback> _callbacks = [];
     public void RegisterCallback(PopupCallback cb) => _callbacks.Add(cb);
     public bool RemoveCallback(PopupCallback cb) => _callbacks.Remove(cb);
-    public abstract void Render();
+    public abstract void Render(ImComponents.Raii.IMenu rai);
     public abstract void RenderConfig();
     public void Config(PopupCallback? CustomCallback = null)
     {

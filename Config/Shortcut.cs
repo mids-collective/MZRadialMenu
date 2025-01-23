@@ -15,17 +15,17 @@ public class Shortcut : BaseItem, ITemplatable
     {
         CmdService.Execute(Command);
     }
-    public override void Render()
+    public override void Render(ImComponents.Raii.IMenu im)
     {
-        if (RadialMenu.Instance.RadialMenuItem(Title))
+        if (im.RadialMenuItem(Title))
         {
             Execute();
         }
     }
 
-    public void RenderTemplate(TemplateObject reps)
+    public void RenderTemplate(TemplateObject reps, ImComponents.Raii.IMenu im)
     {
-        if(RadialMenu.Instance.RadialMenuItem(Title)) {
+        if(im.RadialMenuItem(Title)) {
             ExecuteTemplate(reps.repl);
         }
     }

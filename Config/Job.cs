@@ -29,9 +29,9 @@ public class Job : BaseItem
     {
         CmdService.Execute($"/gs change \"{cljb.Where(x => x.NameEnglish.ToString().Equals(Title)).First().NameEnglish}\"");
     }
-    public override void Render()
+    public override void Render(ImComponents.Raii.IMenu im)
     {
-        if (RadialMenu.Instance.RadialMenuItem(Title))
+        if (im.RadialMenuItem(Title))
         {
             Execute();
         }
