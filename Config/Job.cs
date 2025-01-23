@@ -31,7 +31,7 @@ public class Job : BaseItem
     }
     public override void Render()
     {
-        if (AdvRadialMenu.Instance.RadialMenuItem(Title))
+        if (RadialMenu.Instance.RadialMenuItem(Title))
         {
             Execute();
         }

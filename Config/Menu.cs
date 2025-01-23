@@ -89,13 +89,13 @@ public partial class Menu : BaseItem, ITemplatable
     }
     public override void Render()
     {
-        if (AdvRadialMenu.Instance.BeginRadialMenu(GetTitle()))
+        if (RadialMenu.Instance.BeginRadialMenu(GetTitle()))
         {
             foreach (var sh in Sublist)
             {
                 sh.Render();
             }
-            AdvRadialMenu.Instance.EndRadialMenu();
+            RadialMenu.Instance.EndRadialMenu();
         }
     }
     public override void ClearID()

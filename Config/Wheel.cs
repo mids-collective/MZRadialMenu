@@ -40,10 +40,10 @@ public class Wheel : Menu
     {
         if (IsOpen)
         {
-            if (AdvRadialMenu.Instance.BeginRadialPopup($"##Wheel", open))
+            if (RadialMenu.Instance.BeginRadialPopup($"##Wheel", open))
             {
                 Render();
-                AdvRadialMenu.Instance.EndRadialMenu();
+                RadialMenu.Instance.EndRadialMenu();
             }
         }
     }

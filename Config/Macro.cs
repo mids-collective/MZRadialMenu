@@ -38,7 +38,7 @@ public class Macro : BaseItem, ITemplatable
     }
     public override void Render()
     {
-        if (AdvRadialMenu.Instance.RadialMenuItem(Title))
+        if (RadialMenu.Instance.RadialMenuItem(Title))
         {
             Execute();
         }
@@ -46,7 +46,7 @@ public class Macro : BaseItem, ITemplatable
 
     public void RenderTemplate(TemplateObject reps)
     {
-        if (AdvRadialMenu.Instance.RadialMenuItem(Title))
+        if (RadialMenu.Instance.RadialMenuItem(Title))
         {
             ExecuteTemplate(reps.repl);
         }

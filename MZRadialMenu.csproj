@@ -27,9 +27,8 @@
     <EmbeddedResource Include="locale.json"/>
     <EmbeddedResource Include="sigs.json"/>
   </ItemGroup>
-
   <ItemGroup>
     <Compile Remove="lib/**" />
-    <ProjectReference Include="lib\ImComponents\ImComponents.csproj" />
+    <ProjectReference Include="lib/ImComponents/ImComponents.csproj" />
   </ItemGroup>
 </Project>

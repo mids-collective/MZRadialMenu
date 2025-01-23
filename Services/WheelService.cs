@@ -30,14 +30,12 @@ public sealed class WheelService : IService<WheelService>
                 if (Config.key.key != 0x0)
                 {
                     var open = DalamudApi.Keys[Config.key.key];
-                    if (open && !_config.WheelSet.Any(x => x.IsOpen) && !UIService.Instance.IsGameTextInputActive)
-                    {
+                    if (open && !UIService.Instance.IsGameTextInputActive)
+                    { 
                         Config.IsOpen = true;
-                        ImGui.OpenPopup("##Wheel", ImGuiPopupFlags.NoOpenOverExistingPopup);
                     }
                     Config.Render(open);
-                    if (!open)
-                    {
+                    if(!open) {
                         Config.IsOpen = false;
                     }
                 }

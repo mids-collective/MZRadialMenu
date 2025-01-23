@@ -117,20 +117,20 @@ public class MenuTemplate : BaseItem
     }
     public override void Render()
     {
-        if (AdvRadialMenu.Instance.BeginRadialMenu(GetTitle()))
+        if (RadialMenu.Instance.BeginRadialMenu(GetTitle()))
         {
             foreach (var temp in templates)
             {
-                if (AdvRadialMenu.Instance.BeginRadialMenu(temp.name))
+                if (RadialMenu.Instance.BeginRadialMenu(temp.name))
                 {
                     foreach (var sh in Sublist)
                     {
                         sh.RenderTemplate(temp);
                     }
-                    AdvRadialMenu.Instance.EndRadialMenu();
+                    RadialMenu.Instance.EndRadialMenu();
                 }
             }
-            AdvRadialMenu.Instance.EndRadialMenu();
+            RadialMenu.Instance.EndRadialMenu();
         }
     }
     public override void ClearID()
