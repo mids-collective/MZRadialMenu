@@ -1,4 +1,4 @@
-using ImComponents;
+using ImComponents.Raii;
 using ImGuiNET;
 
 using Newtonsoft.Json;
@@ -29,7 +29,7 @@ public class Job : BaseItem
     {
         CmdService.Execute($"/gs change \"{cljb.Where(x => x.NameEnglish.ToString().Equals(Title)).First().NameEnglish}\"");
     }
-    public override void Render(ImComponents.Raii.IMenu im)
+    public override void Render(IMenu im)
     {
         if (im.RadialMenuItem(Title))
         {

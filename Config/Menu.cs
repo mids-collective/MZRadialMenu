@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using ImComponents.Raii;
 using ImGuiNET;
 using Newtonsoft.Json;
@@ -20,17 +19,17 @@ public partial class Menu : BaseItem, ITemplatable
         RegisterCallback(AddItemPopup);
     }
     private int current_item;
-    public void AddItemPopup(IMenu ti)
+    public void AddItemPopup(IBaseItem ti)
     {
         ImGui.Text("Item to add");
         ImGui.ListBox($"##{ti.GetID()}", ref current_item, [.. ItemNames], ItemNames.Count);
         if (ImGui.Button("Add Item"))
         {
             var item = Activator.CreateInstance(Types[current_item]);
-            Sublist.Add((item as IMenu)!);
+            Sublist.Add((item as IBaseItem)!);
         }
     }
-    public void MenuPopup(IMenu ti)
+    public void MenuPopup(IBaseItem ti)
     {
         ImGui.InputText($"Title##{ti.GetID()}", ref Title, 0xF);
         if (ImGui.Button($"Import from clipboard##{ti.GetID()}"))
@@ -40,7 +39,7 @@ public partial class Menu : BaseItem, ITemplatable
             foreach (var match in matches)
             {
                 var import = match.Groups["import"].Value;
-                var obj = JsonConvert.DeserializeObject<IMenu>(Encoding.UTF8.GetString(Convert.FromBase64String(import)));
+                var obj = JsonConvert.DeserializeObject<IBaseItem>(Encoding.UTF8.GetString(Convert.FromBase64String(import)));
                 if (obj != null)
                 {
                     obj.ResetID();
@@ -49,7 +48,7 @@ public partial class Menu : BaseItem, ITemplatable
             }
         }
     }
-    public void GenericPopup(IMenu ti)
+    public void GenericPopup(IBaseItem ti)
     {
         var i = Sublist.FindIndex(x => x.GetID() == ti.GetID());
         if (ImGui.Button($"Export to clipboard##{ti.GetID()}"))
@@ -88,7 +87,7 @@ public partial class Menu : BaseItem, ITemplatable
             item.Config(GenericPopup);
         }
     }
-    public override void Render(ImComponents.Raii.IMenu im)
+    public override void Render(IMenu im)
     {
         using var raii = im.Menu(Title);
         if (raii.open)
@@ -116,14 +115,14 @@ public partial class Menu : BaseItem, ITemplatable
         }
     }
 
-    public void RenderTemplate(TemplateObject rep, ImComponents.Raii.IMenu im)
+    public void RenderTemplate(TemplateObject rep, IMenu im)
     {
         Render(im);
     }
 
-    public List<IMenu> Sublist = [];
+    public List<IBaseItem> Sublist = [];
     [JsonIgnore]
-    private static List<Type> Types => Registry.GetTypes<IMenu>();
+    private static List<Type> Types => Registry.GetTypes<IBaseItem>();
     [JsonIgnore]
     private static List<string> ItemNames => Types.Where(x => x.GetCustomAttribute<HiddenAttribute>() == null).Select(x => $"{x.GetCustomAttribute<DisplayNameAttribute>()?.Name ?? x.Name}").ToList();
 }

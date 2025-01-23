@@ -1,5 +1,5 @@
 using ImGuiNET;
-using ImComponents;
+using ImComponents.Raii;
 
 using Plugin.Services;
 
@@ -15,7 +15,7 @@ public class Shortcut : BaseItem, ITemplatable
     {
         CmdService.Execute(Command);
     }
-    public override void Render(ImComponents.Raii.IMenu im)
+    public override void Render(IMenu im)
     {
         if (im.RadialMenuItem(Title))
         {
@@ -23,7 +23,7 @@ public class Shortcut : BaseItem, ITemplatable
         }
     }
 
-    public void RenderTemplate(TemplateObject reps, ImComponents.Raii.IMenu im)
+    public void RenderTemplate(TemplateObject reps, IMenu im)
     {
         if(im.RadialMenuItem(Title)) {
             ExecuteTemplate(reps.repl);

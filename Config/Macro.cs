@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using ImComponents;
+using ImComponents.Raii;
 using ImGuiNET;
 using Plugin.Attributes;
 using Plugin.Services;
@@ -36,7 +36,7 @@ public class Macro : BaseItem, ITemplatable
         MacroService.Instance.NumCopiedMacroLines = MacroStruct.numLines;
         Marshal.FreeHGlobal(macroPtr);
     }
-    public override void Render(ImComponents.Raii.IMenu im)
+    public override void Render(IMenu im)
     {
         if (im.RadialMenuItem(Title))
         {
@@ -44,7 +44,7 @@ public class Macro : BaseItem, ITemplatable
         }
     }
 
-    public void RenderTemplate(TemplateObject reps, ImComponents.Raii.IMenu im)
+    public void RenderTemplate(TemplateObject reps, IMenu im)
     {
         if (im.RadialMenuItem(Title))
         {

@@ -33,7 +33,7 @@ public sealed class ConfigService : IService<ConfigService>
     {
         ToggleConfig();
     }
-    private void PopupCB(IMenu item)
+    private void PopupCB(IBaseItem item)
     {
         int i = _config.WheelSet.FindIndex(x => x.GetID() == item.GetID());
         ImGui.SameLine();
