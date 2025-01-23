@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using ImComponents;
+using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
+using ImComponents.Raii;
 using ImGuiNET;
 using Newtonsoft.Json;
 using Plugin;
@@ -89,13 +90,13 @@ public partial class Menu : BaseItem, ITemplatable
     }
     public override void Render()
     {
-        if (RadialMenu.Instance.BeginRadialMenu(GetTitle()))
+        using var raii = new SubMenu(Title);
+        if (raii.open)
         {
             foreach (var sh in Sublist)
             {
                 sh.Render();
             }
-            RadialMenu.Instance.EndRadialMenu();
         }
     }
     public override void ClearID()

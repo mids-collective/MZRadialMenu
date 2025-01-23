@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using ImComponents;
+using ImComponents.Raii;
 using ImGuiNET;
 using Newtonsoft.Json;
 using Plugin;
@@ -71,7 +71,8 @@ public class MenuTemplate : BaseItem
             {
                 templates.RemoveAt(i);
             }
-            if(ImGui.IsItemHovered()) {
+            if (ImGui.IsItemHovered())
+            {
                 ImGui.SetTooltip("Delete this template");
             }
         }
@@ -117,20 +118,20 @@ public class MenuTemplate : BaseItem
     }
     public override void Render()
     {
-        if (RadialMenu.Instance.BeginRadialMenu(GetTitle()))
+        using var temp1 = new SubMenu(this.Title);
+        if (temp1.open)
         {
             foreach (var temp in templates)
             {
-                if (RadialMenu.Instance.BeginRadialMenu(temp.name))
+                using var tmp2 = temp1.Menu(temp.name);
+                if (tmp2.open)
                 {
                     foreach (var sh in Sublist)
                     {
                         sh.RenderTemplate(temp);
                     }
-                    RadialMenu.Instance.EndRadialMenu();
                 }
             }
-            RadialMenu.Instance.EndRadialMenu();
         }
     }
     public override void ClearID()

@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 using Dalamud.Game.ClientState.Keys;
-using ImComponents;
+using ImComponents.Raii;
 using ImGuiNET;
 using Newtonsoft.Json;
 using Plugin;
@@ -40,11 +40,9 @@ public class Wheel : Menu
     {
         if (IsOpen)
         {
-            if (RadialMenu.Instance.BeginRadialPopup($"##Wheel", open))
-            {
+            using var rm = new RadialMenu(open);
+            if(rm.open)
                 Render();
-                RadialMenu.Instance.EndRadialMenu();
-            }
         }
     }
     public HotkeyButton key = new();
