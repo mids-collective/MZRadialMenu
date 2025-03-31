@@ -43,7 +43,7 @@ jobs:
       - name: Archive
         run: 7z a $PROJECT_NAME.zip ./bin/Release/*.*
       - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: |
             ${{ env.PROJECT_NAME }}.zip
