@@ -63,6 +63,7 @@ jobs:
           export repo="./repo.json"
           export base="$PROJECT_NAME.json"
           file=$(jq '
+            .[0].TestingDalamudApiLevel = $base[0].TestingDalamudApiLevel |
             .[0].TestingAssemblyVersion=env.ver |
             .[0].DownloadLinkTesting="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}"
           ' $repo --slurpfile base $base)

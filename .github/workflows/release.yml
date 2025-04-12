@@ -60,6 +60,8 @@ jobs:
           export repo="./repo.json"
           export base="$PROJECT_NAME.json"
           file=$(jq '
+            .[0].TestingDalamudApiLevel = $base[0].TestingDalamudApiLevel |
+            .[0].DalamudApiLevel = $base[0].DalamudApiLevel |
             .[0].AssemblyVersion=env.ver |
             .[0].TestingAssemblyVersion=env.ver |
             .[0].DownloadLinkInstall="${{ fromJSON(steps.upload-release.outputs.assets)[0].browser_download_url }}" |
