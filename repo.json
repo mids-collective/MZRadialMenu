@@ -6,7 +6,7 @@
     "Punchline": "Radial Menu 'uff Said",
     "InternalName": "MZRadialMenu",
     "ApplicableVersion": "any",
-    "DalamudApiLevel": 10,
+    "DalamudApiLevel": 12,
     "TestingDalamudApiLevel": 12,
     "Tags": [
       "UI"
@@ -19,11 +19,11 @@
     "LoadPriority": 0,
     "LoadRequiredState": 0,
     "LoadSync": false,
-    "AssemblyVersion": "0.3.2.1",
-    "TestingAssemblyVersion": "0.3.2.1",
-    "DownloadLinkInstall": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.3.2.1/MZRadialMenu.zip",
-    "DownloadLinkTesting": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.3.2.1/MZRadialMenu.zip",
-    "DownloadLinkUpdate": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.3.2.1/MZRadialMenu.zip",
+    "AssemblyVersion": "0.3.2.2",
+    "TestingAssemblyVersion": "0.3.2.2",
+    "DownloadLinkInstall": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.3.2.2/MZRadialMenu.zip",
+    "DownloadLinkTesting": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.3.2.2/MZRadialMenu.zip",
+    "DownloadLinkUpdate": "https://github.com/mids-collective/MZRadialMenu/releases/download/0.3.2.2/MZRadialMenu.zip",
     "IconUrl": ""
   }
 ]
