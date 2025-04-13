@@ -119,8 +119,8 @@ public sealed class ConfigService : IService<ConfigService>
                     var Item = _config.WheelSet[c];
                     Item.Config(PopupCB);
                 }
-                ImGui.End();
             }
+            ImGui.End();
         }
     }
 
