@@ -4,7 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using ImComponents.Raii;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Plugin.Attributes;
 using Plugin.Services;
 using Plugin.Structures;

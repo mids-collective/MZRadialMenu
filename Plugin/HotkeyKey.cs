@@ -1,4 +1,3 @@
-using ImGuiNET;
 using Dalamud.Game.ClientState.Keys;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
@@ -6,6 +5,7 @@ using Newtonsoft.Json.Converters;
 
 using Plugin;
 using System;
+using Dalamud.Bindings.ImGui;
 
 namespace MZRadialMenu;
 

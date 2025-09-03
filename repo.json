@@ -6,8 +6,8 @@
     "Punchline": "Radial Menu 'uff Said",
     "InternalName": "MZRadialMenu",
     "ApplicableVersion": "any",
-    "DalamudApiLevel": 12,
-    "TestingDalamudApiLevel": 12,
+    "DalamudApiLevel": 13,
+    "TestingDalamudApiLevel": 13,
     "Tags": [
       "UI"
     ],

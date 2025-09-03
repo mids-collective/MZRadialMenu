@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Plugin.Attributes;
@@ -47,7 +47,7 @@ public abstract class BaseItem : IBaseItem
         var open = ImGui.TreeNodeEx(GetID(), ImGuiTreeNodeFlags.Framed, GetTitle());
         if (_callbacks.Count != 0 || CustomCallback != null)
         {
-            if (ImGui.BeginPopupContextItem())
+            if (ImGui.BeginPopupContextItem($"Settings##{UUID}"))
             {
                 foreach (var cb in _callbacks)
                 {

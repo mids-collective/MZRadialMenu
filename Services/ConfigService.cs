@@ -1,5 +1,3 @@
-using ImGuiNET;
-
 using Dalamud.Game.ClientState.Keys;
 using Newtonsoft.Json;
 using System.Text;
@@ -8,6 +6,7 @@ using MZRadialMenu.Config;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System;
+using Dalamud.Bindings.ImGui;
 
 namespace Plugin.Services;
 

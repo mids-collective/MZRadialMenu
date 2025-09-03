@@ -1,4 +1,4 @@
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using ImComponents.Raii;
 
 using Plugin.Services;

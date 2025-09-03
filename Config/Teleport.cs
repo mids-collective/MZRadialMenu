@@ -1,4 +1,3 @@
-using ImGuiNET;
 using ImComponents.Raii;
 
 using Newtonsoft.Json;
@@ -7,8 +6,8 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 using Plugin;
-using System.Linq;
 using Lumina.Excel.Sheets;
+using Dalamud.Bindings.ImGui;
 
 namespace MZRadialMenu.Config;
 

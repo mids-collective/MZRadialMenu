@@ -1,6 +1,5 @@
 using ImComponents.Raii;
-using ImGuiNET;
-
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 
 using Plugin;

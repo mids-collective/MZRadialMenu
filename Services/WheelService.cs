@@ -1,8 +1,5 @@
-using System.Linq;
-using ImGuiNET;
-
+using Dalamud.Bindings.ImGui;
 namespace Plugin.Services;
-
 public sealed class WheelService : IService<WheelService>
 {
     public static WheelService Instance => Service<WheelService>.Instance;
